@@ -6,18 +6,24 @@ var renderer;
 var input = new THREE.Vector2();
 var raycaster = new THREE.Raycaster();
 
+var curIndex = 0;
+var line;
+var geometry;
+var corners;
+const lineMaterial = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+
 init();
 animate();
 
 function init(){
     initScene();
     initRenderer();
-    initLine();
+    initBufferGeometry();
 }
 
 function initScene(){
     camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
-    camera.position.set( 0, 0, 100 );
+    camera.position.set( 0, 0, 5 );
     camera.lookAt( 0, 0, 0 );
     
     scene = new THREE.Scene();
@@ -33,10 +39,9 @@ function onDocumentMouseMove( event ) {
 }
 
 function onDocumentMouseClick( event ) {
-    event.preventDefault();
+    //event.preventDefault();
     getInputOnScreen(event);
-
-    //console.log(input.x, input.y);
+    addPoint(input);
 }
 
 function getInputOnScreen( event ){
@@ -71,17 +76,36 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-function initLine(){
-    const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+function initBufferGeometry(){
+    const MAX_POINTS = 500;
 
-    const points = [];
-    points.push( new THREE.Vector3( - 10, 0, 0 ) );
-    points.push( new THREE.Vector3( 0, 10, 0 ) );
-    points.push( new THREE.Vector3( 10, 0, 0 ) );
+    geometry = new THREE.BufferGeometry();
 
-    const geometry = new THREE.BufferGeometry().setFromPoints( points );
+    const positions = new Float32Array( MAX_POINTS * 3 );
+    geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
-    const line = new THREE.Line( geometry, material );
+    geometry.setDrawRange( 0, curIndex );
 
+    line = new THREE.Line( geometry,  lineMaterial );
     scene.add( line );
+
+    let x, y, z, index;
+    x = y = z = index = 0;
+
+    for ( let i = 0, l = MAX_POINTS; i < l; i ++ ) {
+        positions[ index ++ ] = x;
+        positions[ index ++ ] = y;
+        positions[ index ++ ] = z;
+    }
+
+    corners = line.geometry.attributes.position.array;
+}
+
+function addPoint(){
+    corners[curIndex ++ ] = input.x;
+    corners[curIndex ++ ] = input.y;
+    corners[curIndex ++ ] = 0;
+
+    line.geometry.setDrawRange( 0, curIndex / 3 );
+    line.geometry.attributes.position.needsUpdate = true;
 }
