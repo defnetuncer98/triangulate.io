@@ -12,6 +12,7 @@ var polygon;
 var polygonPoints;
 var line;
 var linePoints;
+var isLineActive = false;
 
 init();
 animate();
@@ -24,8 +25,6 @@ function init(){
 }
 
 function initScene(){
-    //camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 500 );
-
     var w = window.innerWidth;
     var h = window.innerHeight;
     var aspectRatio = w / h;
@@ -64,11 +63,14 @@ function initScene(){
 
 function onDocumentMouseMove( event ) {
     getInputOnScreen(event);
+    
+    if(isLineActive)
+        updateLine(input);
 }
 
 function onDocumentMouseClick( event ) {
-    //event.preventDefault();
     getInputOnScreen(event);
+
     addPoint(input);
 }
 
@@ -106,12 +108,14 @@ function animate() {
 
 function initPolygon(){
     polygon = createGeometry(500);
+    polygon.geometry.setDrawRange( 0, 0 );
     polygonPoints = polygon.geometry.attributes.position.array;
     scene.add( polygon );
 }
 
 function initLine(){
     line = createGeometry(2);
+    line.geometry.setDrawRange( 0, 2 );
     linePoints = line.geometry.attributes.position.array;
     scene.add(line);
 }
@@ -121,8 +125,6 @@ function createGeometry(point_count){
 
     const positions = new Float32Array( point_count * 3 );
     geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-
-    geometry.setDrawRange( 0, curPolygonIndex );
 
     const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
 
@@ -143,6 +145,8 @@ function createGeometry(point_count){
 }
 
 function addPoint(){
+    isLineActive = true;
+    
     polygonPoints[curPolygonIndex ++ ] = input.x;
     polygonPoints[curPolygonIndex ++ ] = input.y;
     polygonPoints[curPolygonIndex ++ ] = 0;
@@ -152,9 +156,9 @@ function addPoint(){
 }
 
 function updateLine(){
-    linePoints[0] = polygonPoints[curPolygonIndex - 2];
-    linePoints[1] = polygonPoints[curPolygonIndex - 1];
-    linePoints[2] = polygonPoints[curPolygonIndex];
+    linePoints[0] = polygonPoints[curPolygonIndex - 3];
+    linePoints[1] = polygonPoints[curPolygonIndex - 2];
+    linePoints[2] = polygonPoints[curPolygonIndex - 1];
     
     linePoints[3] = input.x;
     linePoints[4] = input.y;
