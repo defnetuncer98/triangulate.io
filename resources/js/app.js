@@ -6,11 +6,11 @@ var renderer;
 var input = new THREE.Vector2();
 var raycaster = new THREE.Raycaster();
 
-var curIndex = 0;
+var curPolygonIndex = 0;
+var polygon;
+var polygonPoints;
 var line;
-var geometry;
-var corners;
-const lineMaterial = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+var linePoints;
 
 init();
 animate();
@@ -18,7 +18,8 @@ animate();
 function init(){
     initScene();
     initRenderer();
-    initBufferGeometry();
+    initPolygon();
+    initLine();
 }
 
 function initScene(){
@@ -76,36 +77,61 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-function initBufferGeometry(){
-    const MAX_POINTS = 500;
+function initPolygon(){
+    polygon = createGeometry(500);
+    polygonPoints = polygon.geometry.attributes.position.array;
+    scene.add( polygon );
+}
 
-    geometry = new THREE.BufferGeometry();
+function initLine(){
+    line = createGeometry(2);
+    linePoints = line.geometry.attributes.position.array;
+    scene.add(line);
+}
 
-    const positions = new Float32Array( MAX_POINTS * 3 );
+function createGeometry(point_count){
+    const geometry = new THREE.BufferGeometry();
+
+    const positions = new Float32Array( point_count * 3 );
     geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
-    geometry.setDrawRange( 0, curIndex );
+    geometry.setDrawRange( 0, curPolygonIndex );
 
-    line = new THREE.Line( geometry,  lineMaterial );
-    scene.add( line );
+    const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+
+    const line = new THREE.Line( geometry,  material );
+
+    const points = line.geometry.attributes.position.array;
 
     let x, y, z, index;
     x = y = z = index = 0;
 
-    for ( let i = 0, l = MAX_POINTS; i < l; i ++ ) {
-        positions[ index ++ ] = x;
-        positions[ index ++ ] = y;
-        positions[ index ++ ] = z;
+    for ( let i = 0, l = point_count; i < l; i ++ ) {
+        points[ index ++ ] = x;
+        points[ index ++ ] = y;
+        points[ index ++ ] = z;
     }
 
-    corners = line.geometry.attributes.position.array;
+    return line;
 }
 
 function addPoint(){
-    corners[curIndex ++ ] = input.x;
-    corners[curIndex ++ ] = input.y;
-    corners[curIndex ++ ] = 0;
+    polygonPoints[curPolygonIndex ++ ] = input.x;
+    polygonPoints[curPolygonIndex ++ ] = input.y;
+    polygonPoints[curPolygonIndex ++ ] = 0;
 
-    line.geometry.setDrawRange( 0, curIndex / 3 );
+    polygon.geometry.setDrawRange( 0, curPolygonIndex / 3 );
+    polygon.geometry.attributes.position.needsUpdate = true;
+}
+
+function updateLine(){
+    linePoints[0] = polygonPoints[curPolygonIndex - 2];
+    linePoints[1] = polygonPoints[curPolygonIndex - 1];
+    linePoints[2] = polygonPoints[curPolygonIndex];
+    
+    linePoints[3] = input.x;
+    linePoints[4] = input.y;
+    linePoints[5] = 0;
+    
     line.geometry.attributes.position.needsUpdate = true;
 }
