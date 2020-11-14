@@ -1,4 +1,5 @@
 var canvas;
+var container;
 var camera;
 var scene;
 var clock;
@@ -16,15 +17,41 @@ init();
 animate();
 
 function init(){
-    initScene();
     initRenderer();
+    initScene();
     initPolygon();
     initLine();
 }
 
 function initScene(){
-    camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
-    camera.position.set( 0, 0, 5 );
+    //camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 500 );
+
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+    var aspectRatio = w / h;
+    var viewSize = h;
+    
+    var viewport = {
+        viewSize: viewSize,
+        aspectRatio: aspectRatio,
+        left: (-aspectRatio * viewSize) / 2,
+        right: (aspectRatio * viewSize) / 2,
+        top: viewSize / 2,
+        bottom: -viewSize / 2,
+        near: 0,
+        far: 5
+    }
+    
+    camera = new THREE.OrthographicCamera ( 
+        viewport.left, 
+        viewport.right, 
+        viewport.top, 
+        viewport.bottom, 
+        viewport.near, 
+        viewport.far 
+    );
+
+    camera.position.set( 0, 0, 0);
     camera.lookAt( 0, 0, 0 );
     
     scene = new THREE.Scene();
@@ -46,14 +73,13 @@ function onDocumentMouseClick( event ) {
 }
 
 function getInputOnScreen( event ){
-    input.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    input.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    input.x = event.clientX - window.innerWidth/2;
+    input.y = -event.clientY + window.innerHeight/2;
 }
 
 function initRenderer(){
     canvas = document.createElement( 'canvas' );
     var context = canvas.getContext( 'webgl2', { alpha: true } );
-    var container = document.getElementById('container');
     renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context, antialias:true } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
@@ -61,7 +87,8 @@ function initRenderer(){
     //renderer.toneMapping = THREE.ACESFilmicToneMapping;
     //renderer.toneMappingExposure = 0.8;    
     renderer.outputEncoding = THREE.sRGBEncoding;
-
+    
+    container = document.getElementById('container');
     container.appendChild(renderer.domElement);
 }
 
