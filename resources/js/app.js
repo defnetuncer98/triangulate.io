@@ -1,10 +1,10 @@
 var canvas;
-var container;
 var camera;
 var scene;
 var clock;
 var renderer;
 var input = new THREE.Vector2();
+var mouse = new THREE.Vector2();
 var raycaster = new THREE.Raycaster();
 
 var curPolygonIndex = 0;
@@ -13,6 +13,10 @@ var polygonPoints;
 var line;
 var linePoints;
 var isLineActive = false;
+
+const cursor = document.getElementById('cursor-container');
+const container = document.getElementById('container');
+
 
 init();
 animate();
@@ -59,24 +63,36 @@ function initScene(){
     window.addEventListener( 'resize', onWindowResize, false );
     window.addEventListener( 'click', onDocumentMouseClick, false );
     window.addEventListener( 'mousemove', onDocumentMouseMove, false );
+    window.addEventListener( 'keyup', onKeyUp, false );
+}
+
+function onDocumentMouseClick( event ) {
+    getInputOnScreen(event);
+
+    addPoint();
 }
 
 function onDocumentMouseMove( event ) {
     getInputOnScreen(event);
     
     if(isLineActive)
-        updateLine(input);
+        updateLine();
+
+    updateCursor();
 }
 
-function onDocumentMouseClick( event ) {
-    getInputOnScreen(event);
-
-    addPoint(input);
+function onKeyUp( event ) {
+    if (event.keyCode === 13) {
+        document.getElementById("triangulateMe").click();
+    }
 }
 
 function getInputOnScreen( event ){
-    input.x = event.clientX - window.innerWidth/2;
-    input.y = -event.clientY + window.innerHeight/2;
+    mouse.x = event.clientX;
+    mouse.y = event.clientY;
+
+    input.x = mouse.x - window.innerWidth/2;
+    input.y = -mouse.y + window.innerHeight/2;
 }
 
 function initRenderer(){
@@ -90,7 +106,6 @@ function initRenderer(){
     //renderer.toneMappingExposure = 0.8;    
     renderer.outputEncoding = THREE.sRGBEncoding;
     
-    container = document.getElementById('container');
     container.appendChild(renderer.domElement);
 }
 
@@ -126,7 +141,7 @@ function createGeometry(point_count){
     const positions = new Float32Array( point_count * 3 );
     geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
-    const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+    const material = new THREE.LineBasicMaterial( { color: 0xffffff } );
 
     const line = new THREE.Line( geometry,  material );
 
@@ -165,4 +180,9 @@ function updateLine(){
     linePoints[5] = 0;
     
     line.geometry.attributes.position.needsUpdate = true;
+}
+
+function updateCursor(){
+    cursor.style.top = mouse.y + 'px';
+    cursor.style.left = mouse.x + 'px';
 }
