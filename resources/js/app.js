@@ -13,10 +13,18 @@ var polygonPoints;
 var line;
 var linePoints;
 var isLineActive = false;
+var isButtonHovered = false;
+
+const colorPalette_01 = 0xffffff;
+const colorPalette_02 = 0x6495ED;
 
 const cursor = document.getElementById('cursor-container');
 const container = document.getElementById('canvas-wrap');
+const triangulateMe = document.getElementById("triangulateMe");
+triangulateMe.disabled = true;
 
+const lineBasicMaterial = new THREE.LineBasicMaterial( { color: colorPalette_01 } );
+const lineBasicMaterial_Colored = new THREE.LineBasicMaterial( { color: colorPalette_02 } );
 
 init();
 animate();
@@ -66,16 +74,50 @@ function initScene(){
     window.addEventListener( 'keyup', onKeyUp, false );
 }
 
+function onMouseEnteredButton(){
+    isButtonHovered = true;
+
+    if(!isLineActive)
+        return;
+    
+    connectPolygon();
+}
+
+function onMouseLeftButton(){
+    isButtonHovered = false;
+
+    if(!isLineActive)
+        return;
+
+    updateLine();
+}
+
+function triangulate(){
+
+}
+
 function onDocumentMouseClick( event ) {
     getInputOnScreen(event);
 
-    addPoint();
+    tryEnableButton();
+
+    if(!isButtonHovered)
+        addPoint();
+}
+
+function tryEnableButton(){
+    if(getPointCount()>=3)
+        triangulateMe.disabled = false;
+}
+
+function getPointCount(){
+    return curPolygonIndex / 3;
 }
 
 function onDocumentMouseMove( event ) {
     getInputOnScreen(event);
     
-    if(isLineActive)
+    if(isLineActive && !isButtonHovered)
         updateLine();
 
     updateCursor();
@@ -83,7 +125,7 @@ function onDocumentMouseMove( event ) {
 
 function onKeyUp( event ) {
     if (event.keyCode === 13) {
-        document.getElementById("triangulateMe").click();
+        triangulateMe.click();
     }
 }
 
@@ -141,9 +183,7 @@ function createGeometry(point_count){
     const positions = new Float32Array( point_count * 3 );
     geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
-    const material = new THREE.LineBasicMaterial( { color: 0xffffff } );
-
-    const line = new THREE.Line( geometry,  material );
+    const line = new THREE.Line( geometry,  lineBasicMaterial_Colored );
 
     const points = line.geometry.attributes.position.array;
 
@@ -166,14 +206,50 @@ function addPoint(){
     polygonPoints[curPolygonIndex ++ ] = input.y;
     polygonPoints[curPolygonIndex ++ ] = 0;
 
-    polygon.geometry.setDrawRange( 0, curPolygonIndex / 3 );
+    polygon.geometry.setDrawRange( 0, getPointCount() );
     polygon.geometry.attributes.position.needsUpdate = true;
+}   
+
+function connectPolygon(){
+    line.material = lineBasicMaterial_Colored;
+
+    const lastPoint = getLastPoint();
+
+    linePoints[0] = lastPoint.x;
+    linePoints[1] = lastPoint.y;
+    linePoints[2] = lastPoint.z;
+    
+    const firstPoint = getFirstPoint();
+
+    linePoints[3] = firstPoint.x;
+    linePoints[4] = firstPoint.y;
+    linePoints[5] = firstPoint.z;
+    
+    line.geometry.attributes.position.needsUpdate = true;
+}
+
+function getLastPoint(){
+    return new THREE.Vector3(
+        polygonPoints[curPolygonIndex - 3],
+        polygonPoints[curPolygonIndex - 2],
+        polygonPoints[curPolygonIndex - 1])
+}
+
+function getFirstPoint(){
+    return new THREE.Vector3(
+        polygonPoints[0],
+        polygonPoints[1],
+        polygonPoints[2])
 }
 
 function updateLine(){
-    linePoints[0] = polygonPoints[curPolygonIndex - 3];
-    linePoints[1] = polygonPoints[curPolygonIndex - 2];
-    linePoints[2] = polygonPoints[curPolygonIndex - 1];
+    line.material = lineBasicMaterial;
+
+    const lastPoint = getLastPoint();
+
+    linePoints[0] = lastPoint.x;
+    linePoints[1] = lastPoint.y;
+    linePoints[2] = lastPoint.z;
     
     linePoints[3] = input.x;
     linePoints[4] = input.y;
