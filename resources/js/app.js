@@ -15,7 +15,7 @@ var linePoints;
 var isLineActive = false;
 
 const cursor = document.getElementById('cursor-container');
-const container = document.getElementById('container');
+const container = document.getElementById('canvas-wrap');
 
 
 init();
