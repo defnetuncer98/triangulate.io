@@ -102,12 +102,16 @@ function onDocumentMouseClick( event ) {
     tryEnableButton();
 
     if(!isButtonHovered)
-        addPoint();
+        addPoint(input);
 }
 
 function tryEnableButton(){
-    if(getPointCount()>=3)
+    if(canTriangulate())
         triangulateMe.disabled = false;
+}
+
+function canTriangulate(){
+    return getPointCount()>=2;
 }
 
 function getPointCount(){
@@ -124,9 +128,12 @@ function onDocumentMouseMove( event ) {
 }
 
 function onKeyUp( event ) {
-    if (event.keyCode === 13) {
-        triangulateMe.click();
+    if (event.keyCode != 13) {
+        if(canTriangulate())
+            triangulateMe.click();
     }
+
+    //add esc to clear
 }
 
 function getInputOnScreen( event ){
@@ -199,16 +206,16 @@ function createGeometry(point_count){
     return line;
 }
 
-function addPoint(){
+function addPoint(point){
     isLineActive = true;
     
-    polygonPoints[curPolygonIndex ++ ] = input.x;
-    polygonPoints[curPolygonIndex ++ ] = input.y;
+    polygonPoints[curPolygonIndex ++ ] = point.x;
+    polygonPoints[curPolygonIndex ++ ] = point.y;
     polygonPoints[curPolygonIndex ++ ] = 0;
 
     polygon.geometry.setDrawRange( 0, getPointCount() );
     polygon.geometry.attributes.position.needsUpdate = true;
-}   
+}
 
 function connectPolygon(){
     line.material = lineBasicMaterial_Colored;
