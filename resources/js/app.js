@@ -14,6 +14,7 @@ var line;
 var linePoints;
 var isLineActive = false;
 var isButtonHovered = false;
+var isButtonClicked = false;
 var convexHull = new THREE.Vector3();
 var convexHullIndex;
 var distanceThreshold = 2;
@@ -85,22 +86,28 @@ function initScene(){
     window.addEventListener( 'keyup', onKeyUp, false );
 }
 
-function onMouseEnteredButton(){
+function onEnteredButton(){
     isButtonHovered = true;
 
-    if(!isLineActive)
+    if(!isLineActive || isButtonClicked)
         return;
     
     connectPolygon();
 }
 
-function onMouseLeftButton(){
+function onLeftButton(){
     isButtonHovered = false;
 
-    if(!isLineActive)
+    if(!isLineActive || isButtonClicked)
         return;
 
     updateLine();
+}
+
+function onClickedButton(){
+    isButtonClicked = true;
+
+    triangulate();
 }
 
 function triangulate(){
@@ -110,8 +117,12 @@ function triangulate(){
 }
 
 function findDiagonals(){
-    findOrientation();
+    var orientation = findOrientation();
+    if(orientation>0)
+        triangulationInfo.innerHTML += "Orientation: clockwise ";
 
+    if(orientation<0)
+        triangulationInfo.innerHTML += "Orientation: counter clockwise ";
 }
 
 function findOrientation(){
@@ -122,24 +133,51 @@ function findOrientation(){
 }
 
 function onDocumentMouseClick( event ) {
-    getInputOnScreen(event);
-
-    if(input.distanceTo(getLastPoint()) < distanceThreshold)
+    if(isButtonHovered || isButtonClicked || input.distanceTo(getLastPoint()) < distanceThreshold)
         return;
 
-    tryEnableButton();
+    getInputOnScreen(event);
 
     if(!isLineActive){
         updateConvexHull();
         isLineActive = true;
     }
 
-    if(!isButtonHovered)
-        addPoint(input);
+    addPoint(input);
+
+    tryEnableButton();
 
     tryFindConvexHull();
 
     loadText();
+}
+
+function onDocumentMouseMove( event ) {
+    getInputOnScreen(event);
+
+    updateCursor();
+
+    if(!isLineActive || isButtonHovered || isButtonClicked)
+        return;
+    
+    updateLine();
+}
+
+function onKeyUp( event ) {
+    if (event.keyCode != 13) {
+        if(canTriangulate())
+            triangulateMe.click();
+    }
+
+    //add esc to clear
+}
+
+function getInputOnScreen( event ){
+    mouse.x = event.clientX;
+    mouse.y = event.clientY;
+
+    input.x = mouse.x - window.innerWidth/2;
+    input.y = -mouse.y + window.innerHeight/2;
 }
 
 function updateConvexHull(){
@@ -182,37 +220,11 @@ function tryEnableButton(){
 }
 
 function canTriangulate(){
-    return getPointCount()>=2;
+    return getPointCount()>=3;
 }
 
 function getPointCount(){
     return curPolygonIndex / 3;
-}
-
-function onDocumentMouseMove( event ) {
-    getInputOnScreen(event);
-    
-    if(isLineActive && !isButtonHovered)
-        updateLine();
-
-    updateCursor();
-}
-
-function onKeyUp( event ) {
-    if (event.keyCode != 13) {
-        if(canTriangulate())
-            triangulateMe.click();
-    }
-
-    //add esc to clear
-}
-
-function getInputOnScreen( event ){
-    mouse.x = event.clientX;
-    mouse.y = event.clientY;
-
-    input.x = mouse.x - window.innerWidth/2;
-    input.y = -mouse.y + window.innerHeight/2;
 }
 
 function initRenderer(){
