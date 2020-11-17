@@ -83,7 +83,6 @@ function initScene(){
     window.addEventListener( 'resize', onWindowResize, false );
     window.addEventListener( 'click', onDocumentMouseClick, false );
     window.addEventListener( 'mousemove', onDocumentMouseMove, false );
-    window.addEventListener( 'keyup', onKeyUp, false );
 }
 
 function onEnteredButton(){
@@ -106,29 +105,65 @@ function onLeftButton(){
 
 function onClickedButton(){
     isButtonClicked = true;
+    triangulateMe.style.visibility = 'hidden';
 
     triangulate();
 }
 
 function triangulate(){
-    addPoint(getLastPoint());
-
-    triangulationInfo.innerHTML += "ConvexHull: " + letters[convexHullIndex / 3] + "<br />";
-
     findDiagonals();
 }
 
+function findConvexHull(){
+    triangulationInfo.innerHTML += "ConvexHull: " + letters[convexHullIndex / 3] + "<br />";
+}
+
 function findDiagonals(){
+    findConvexHull();
+
     var orientation = findOrientation();
+
+    for(i=0; i<getPointCount(); i++){
+        var a,b = findAngles(i*3, orientation);
+    }
+}
+
+function findAngles(index, orientation){
+    const angle = findAngle(index);
+
+    console.log(angle);
+    const det = findDeterminant(index);
+    //if(det == orientation)
+    return 0,0;
+}
+
+function findAngle(index){
+    var a = getPreviousPoint(index);
+    var b = getPoint(index);
+    var c = getNextPoint(index);
+    
+    var dir1 = new THREE.Vector3();
+    dir1.subVectors( a, b ).normalize();
+
+    var dir2 = new THREE.Vector3();
+    dir2.subVectors( c, b ).normalize();
+
+    return dir1.angleTo(dir2);
+}
+
+function findOrientation(){
+    const orientation = findDeterminant(convexHullIndex);
     if(orientation<0)
         triangulationInfo.innerHTML += "Orientation: Clockwise <br />";
     else if(orientation>0)
         triangulationInfo.innerHTML += "Orientation: Counter Clockwise <br />";
+
+    return orientation;
 }
 
-function findOrientation(){
+function findDeterminant(index){
     var a = getPreviousPoint(convexHullIndex);
-    var b = new THREE.Vector3(convexHull.x, convexHull.y, convexHull.z);
+    var b = getPoint(convexHullIndex);
     var c = getNextPoint(convexHullIndex);
     return (b.x*c.y + a.x*b.y + a.y*c.x) - (a.y*b.x + b.y*c.x + a.x*c.y);
 }
@@ -145,13 +180,17 @@ function getNextPoint(index){
     else return new THREE.Vector3(polygonPoints[index+3], polygonPoints[index+4], polygonPoints[index+5]);
 }
 
+function getPoint(index){
+    return new THREE.Vector3(polygonPoints[index], polygonPoints[index+1], polygonPoints[index+2]);
+}
+
 function onDocumentMouseClick( event ) {
     if(isButtonHovered || isButtonClicked || input.distanceTo(getLastPoint()) < distanceThreshold)
         return;
 
     getInputOnScreen(event);
 
-    addPoint(input);
+    addPoint();
 
     if(!isLineActive){
         updateConvexHull();
@@ -174,15 +213,6 @@ function onDocumentMouseMove( event ) {
         return;
     
     updateLine();
-}
-
-function onKeyUp( event ) {
-    if (event.keyCode != 13) {
-        if(canTriangulate())
-            triangulateMe.click();
-    }
-
-    //add esc to clear
 }
 
 function getInputOnScreen( event ){
@@ -237,7 +267,7 @@ function canTriangulate(){
 }
 
 function getPointCount(){
-    return curPolygonIndex / 3;
+    return (curPolygonIndex) / 3;
 }
 
 function initRenderer(){
@@ -302,9 +332,9 @@ function createLineGeometry(point_count){
     return line;
 }
 
-function addPoint(point){    
-    polygonPoints[curPolygonIndex ++ ] = point.x;
-    polygonPoints[curPolygonIndex ++ ] = point.y;
+function addPoint(){    
+    polygonPoints[curPolygonIndex ++ ] = input.x;
+    polygonPoints[curPolygonIndex ++ ] = input.y;
     polygonPoints[curPolygonIndex ++ ] = 0;
 
     polygon.geometry.setDrawRange( 0, getPointCount() );
