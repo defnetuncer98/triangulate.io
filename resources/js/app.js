@@ -18,6 +18,7 @@ var isButtonClicked = false;
 var convexHull = new THREE.Vector3();
 var convexHullIndex;
 var distanceThreshold = 2;
+var diagonals = [];
 
 const colorPalette_01 = 0xffffff;
 const colorPalette_02 = 0x6495ED;
@@ -124,15 +125,45 @@ function findDiagonals(){
     var orientation = findOrientation();
 
     for(i=0; i<getPointCount(); i++){
-        var a,b = findAngles(i*3, orientation);
+        startIndex = i*3;
+        isConvex = findAngle(startIndex, orientation);
+        
+        var a = getPoint(getPreviousIndex(startIndex));
+        var b = getPoint(startIndex);
+        var c = getPoint(getNextIndex(startIndex));
+
+        if(!orientation){
+            c = getPoint(getPreviousIndex(startIndex));
+            a = getPoint(getNextIndex(startIndex));
+        }
+
+        for(j=i; j<getPointCount(); j++){
+            endIndex = j*3;
+            if(endIndex==getNextIndex(startIndex) || endIndex==getPreviousIndex(startIndex))
+                continue;
+
+            var line = new THREE.Line3(b, getPoint(endIndex));
+            if(isConvex && isLeft(line, a) && isRight(line, c))
+                diagonals.push(line);
+            else if(!isConvex && isLeft(line, c) && isRight(line, a))
+                diagonals.push(line);
+        }
     }
 }
 
-function findAngles(index, orientation){
-    var a = getPreviousPoint(index);
+function isLeft(line, p){
+    return (p.y-line.start.y)*(line.end.x-line.start.x) > (p.x-line.start.x)*(line.end.y-line.start.y);
+}
+
+function isRight(line, p){
+    return !isLeft(line,p);
+}
+
+function findAngle(index, orientation){
+    var a = getPoint(getPreviousIndex(index));
     var b = getPoint(index);
-    var c = getNextPoint(index);
-    
+    var c = getPoint(getNextIndex(index));
+
     var dir1 = new THREE.Vector3();
     dir1.subVectors( a, b ).normalize();
 
@@ -141,44 +172,45 @@ function findAngles(index, orientation){
 
     var angle = THREE.MathUtils.radToDeg(dir1.angleTo(dir2));
 
-    const det = findDeterminant(index);
-    if(det != orientation)
+    if(orientation != findDeterminant(index))
         angle = 360-angle;
 
     var textPos = new THREE.Vector3(b.x, b.y - 20, b.z);
     loadText(parseInt(angle)+"", textPos);
 
-    return angle;
+    return angle<180;
 }
 
 function findOrientation(){
     const orientation = findDeterminant(convexHullIndex);
-    if(orientation<0)
-        triangulationInfo.innerHTML += "Orientation: Clockwise <br />";
-    else if(orientation>0)
+    if(orientation)
         triangulationInfo.innerHTML += "Orientation: Counter Clockwise <br />";
+    else
+        triangulationInfo.innerHTML += "Orientation: Clockwise <br />";
 
-    return orientation<0;
+    return orientation;
 }
 
 function findDeterminant(index){
-    var a = getPreviousPoint(index);
+    var a = getPoint(getPreviousIndex(index));
     var b = getPoint(index);
-    var c = getNextPoint(index);
+    var c = getPoint(getNextIndex(index));
     const det = (b.x*c.y + a.x*b.y + a.y*c.x) - (a.y*b.x + b.y*c.x + a.x*c.y);
-    return det<0;
+    return det>0;
 }
 
-function getPreviousPoint(index){
-    if(index == 0)
-        return new THREE.Vector3(polygonPoints[curPolygonIndex-3], polygonPoints[curPolygonIndex-2], polygonPoints[curPolygonIndex-1]);
-    else return new THREE.Vector3(polygonPoints[index-3], polygonPoints[index-2], polygonPoints[index-1]);
+function getPreviousIndex(index){
+    if(index==0)
+        return curPolygonIndex-3;
+    else
+        return index-3;
 }
 
-function getNextPoint(index){
+function getNextIndex(index){
     if(index == curPolygonIndex-3)
-        return new THREE.Vector3(polygonPoints[0], polygonPoints[1], polygonPoints[2]);
-    else return new THREE.Vector3(polygonPoints[index+3], polygonPoints[index+4], polygonPoints[index+5]);
+        return 0;
+    else
+        return index+3;
 }
 
 function getPoint(index){
