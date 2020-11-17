@@ -24,7 +24,7 @@ const colorPalette_02 = 0x6495ED;
 const cursor = document.getElementById('cursor-container');
 const container = document.getElementById('canvas-wrap');
 const triangulateMe = document.getElementById("triangulateMe");
-triangulateMe.disabled = true;
+const triangulationInfo = document.getElementById("triangulationInfo");
 
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -178,7 +178,7 @@ function tryFindConvexHull(){
 
 function tryEnableButton(){
     if(canTriangulate())
-        triangulateMe.disabled = false;
+        triangulateMe.style.visibility = 'visible';
 }
 
 function canTriangulate(){
