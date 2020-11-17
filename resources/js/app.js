@@ -129,15 +129,6 @@ function findDiagonals(){
 }
 
 function findAngles(index, orientation){
-    const angle = findAngle(index);
-
-    console.log(angle);
-    const det = findDeterminant(index);
-    //if(det == orientation)
-    return 0,0;
-}
-
-function findAngle(index){
     var a = getPreviousPoint(index);
     var b = getPoint(index);
     var c = getNextPoint(index);
@@ -148,7 +139,16 @@ function findAngle(index){
     var dir2 = new THREE.Vector3();
     dir2.subVectors( c, b ).normalize();
 
-    return dir1.angleTo(dir2);
+    var angle = THREE.MathUtils.radToDeg(dir1.angleTo(dir2));
+
+    const det = findDeterminant(index);
+    if(det != orientation)
+        angle = 360-angle;
+
+    var textPos = new THREE.Vector3(b.x, b.y - 20, b.z);
+    loadText(parseInt(angle)+"", textPos);
+
+    return angle;
 }
 
 function findOrientation(){
@@ -158,14 +158,15 @@ function findOrientation(){
     else if(orientation>0)
         triangulationInfo.innerHTML += "Orientation: Counter Clockwise <br />";
 
-    return orientation;
+    return orientation<0;
 }
 
 function findDeterminant(index){
-    var a = getPreviousPoint(convexHullIndex);
-    var b = getPoint(convexHullIndex);
-    var c = getNextPoint(convexHullIndex);
-    return (b.x*c.y + a.x*b.y + a.y*c.x) - (a.y*b.x + b.y*c.x + a.x*c.y);
+    var a = getPreviousPoint(index);
+    var b = getPoint(index);
+    var c = getNextPoint(index);
+    const det = (b.x*c.y + a.x*b.y + a.y*c.x) - (a.y*b.x + b.y*c.x + a.x*c.y);
+    return det<0;
 }
 
 function getPreviousPoint(index){
@@ -201,7 +202,8 @@ function onDocumentMouseClick( event ) {
 
     tryFindConvexHull();
 
-    loadText();
+    var textPos = new THREE.Vector3(input.x, input.y + 10, input.z);
+    loadText(letters[getPointCount()-1], textPos);
 }
 
 function onDocumentMouseMove( event ) {
@@ -230,11 +232,10 @@ function updateConvexHull(){
     convexHullIndex = curPolygonIndex - 3;
 }
 
-function loadText(){
+function loadText(text, pos){
     var loader = new THREE.FontLoader();
     loader.load( './resources/fonts/Roboto_Regular.json', function ( font ) {
-        var text = createText(font, letters[getPointCount()-1], input.x, input.y, input.z);
-        scene.add( text );
+        scene.add( createText(font, text, pos.x, pos.y, pos.z));
     });    
 }
 
@@ -243,7 +244,7 @@ function createText(font, message, x, y, z, size=12, mat=matLite){
     var geometry = new THREE.ShapeBufferGeometry( shapes );
     geometry.computeBoundingBox();
     var xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
-    geometry.translate( xMid, 10, 0 );
+    geometry.translate( xMid, 0, 0 );
     var text = new THREE.Mesh( geometry, mat );
     text.position.copy(new THREE.Vector3(x, y, z));
     text.name=name;
