@@ -72,6 +72,7 @@ canvas {
 }
 
 #triangulationInfo{
+    grid-column-start: 2;
     grid-column-end: span 4;
     grid-row-start: 8;
     color: rgba(255, 255, 255, 0.4);

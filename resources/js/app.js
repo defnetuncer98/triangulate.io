@@ -113,23 +113,36 @@ function onClickedButton(){
 function triangulate(){
     addPoint(getLastPoint());
 
+    triangulationInfo.innerHTML += "ConvexHull: " + letters[convexHullIndex / 3] + "<br />";
+
     findDiagonals();
 }
 
 function findDiagonals(){
     var orientation = findOrientation();
-    if(orientation>0)
-        triangulationInfo.innerHTML += "Orientation: clockwise ";
-
     if(orientation<0)
-        triangulationInfo.innerHTML += "Orientation: counter clockwise ";
+        triangulationInfo.innerHTML += "Orientation: Clockwise <br />";
+    else if(orientation>0)
+        triangulationInfo.innerHTML += "Orientation: Counter Clockwise <br />";
 }
 
 function findOrientation(){
-    var a = new THREE.Vector3(polygonPoints[convexHullIndex-3, convexHullIndex-2, convexHullIndex-1]);
-    var b = new THREE.Vector3(convexHull);
-    var c = new THREE.Vector3(polygonPoints[convexHullIndex+1, convexHullIndex+2, convexHullIndex+3]);
+    var a = getPreviousPoint(convexHullIndex);
+    var b = new THREE.Vector3(convexHull.x, convexHull.y, convexHull.z);
+    var c = getNextPoint(convexHullIndex);
     return (b.x*c.y + a.x*b.y + a.y*c.x) - (a.y*b.x + b.y*c.x + a.x*c.y);
+}
+
+function getPreviousPoint(index){
+    if(index == 0)
+        return new THREE.Vector3(polygonPoints[curPolygonIndex-3], polygonPoints[curPolygonIndex-2], polygonPoints[curPolygonIndex-1]);
+    else return new THREE.Vector3(polygonPoints[index-3], polygonPoints[index-2], polygonPoints[index-1]);
+}
+
+function getNextPoint(index){
+    if(index == curPolygonIndex-3)
+        return new THREE.Vector3(polygonPoints[0], polygonPoints[1], polygonPoints[2]);
+    else return new THREE.Vector3(polygonPoints[index+3], polygonPoints[index+4], polygonPoints[index+5]);
 }
 
 function onDocumentMouseClick( event ) {
@@ -138,12 +151,12 @@ function onDocumentMouseClick( event ) {
 
     getInputOnScreen(event);
 
+    addPoint(input);
+
     if(!isLineActive){
         updateConvexHull();
         isLineActive = true;
     }
-
-    addPoint(input);
 
     tryEnableButton();
 
