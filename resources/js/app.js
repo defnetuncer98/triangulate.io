@@ -14,6 +14,9 @@ var line;
 var linePoints;
 var isLineActive = false;
 var isButtonHovered = false;
+var convexHull = new THREE.Vector3();
+var convexHullIndex;
+var distanceThreshold = 2;
 
 const colorPalette_01 = 0xffffff;
 const colorPalette_02 = 0x6495ED;
@@ -23,8 +26,16 @@ const container = document.getElementById('canvas-wrap');
 const triangulateMe = document.getElementById("triangulateMe");
 triangulateMe.disabled = true;
 
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
 const lineBasicMaterial = new THREE.LineBasicMaterial( { color: colorPalette_01 } );
 const lineBasicMaterial_Colored = new THREE.LineBasicMaterial( { color: colorPalette_02 } );
+const matLite = new THREE.MeshBasicMaterial( {
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.4,
+    side: THREE.DoubleSide
+} );
 
 init();
 animate();
@@ -93,16 +104,76 @@ function onMouseLeftButton(){
 }
 
 function triangulate(){
+    addPoint(getLastPoint());
 
+    findDiagonals();
+}
+
+function findDiagonals(){
+    findOrientation();
+
+}
+
+function findOrientation(){
+    var a = new THREE.Vector3(polygonPoints[convexHullIndex-3, convexHullIndex-2, convexHullIndex-1]);
+    var b = new THREE.Vector3(convexHull);
+    var c = new THREE.Vector3(polygonPoints[convexHullIndex+1, convexHullIndex+2, convexHullIndex+3]);
+    return (b.x*c.y + a.x*b.y + a.y*c.x) - (a.y*b.x + b.y*c.x + a.x*c.y);
 }
 
 function onDocumentMouseClick( event ) {
     getInputOnScreen(event);
 
+    if(input.distanceTo(getLastPoint()) < distanceThreshold)
+        return;
+
     tryEnableButton();
+
+    if(!isLineActive){
+        updateConvexHull();
+        isLineActive = true;
+    }
 
     if(!isButtonHovered)
         addPoint(input);
+
+    tryFindConvexHull();
+
+    loadText();
+}
+
+function updateConvexHull(){
+    convexHull.x = input.x;
+    convexHull.y = input.y;
+    convexHull.z = input.z;
+    convexHullIndex = curPolygonIndex - 3;
+}
+
+function loadText(){
+    var loader = new THREE.FontLoader();
+    loader.load( './resources/fonts/Roboto_Regular.json', function ( font ) {
+        var text = createText(font, letters[getPointCount()-1], input.x, input.y, input.z);
+        scene.add( text );
+    });    
+}
+
+function createText(font, message, x, y, z, size=12, mat=matLite){
+    var shapes = font.generateShapes( message, size );
+    var geometry = new THREE.ShapeBufferGeometry( shapes );
+    geometry.computeBoundingBox();
+    var xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
+    geometry.translate( xMid, 10, 0 );
+    var text = new THREE.Mesh( geometry, mat );
+    text.position.copy(new THREE.Vector3(x, y, z));
+    text.name=name;
+    return text;
+}
+
+function tryFindConvexHull(){
+    if(input.x < convexHull.x)
+        updateConvexHull();
+    else if(convexHull.x == input.x && input.y < convexHull.y)
+        updateConvexHull();
 }
 
 function tryEnableButton(){
@@ -171,20 +242,20 @@ function animate() {
 }
 
 function initPolygon(){
-    polygon = createGeometry(500);
+    polygon = createLineGeometry(500);
     polygon.geometry.setDrawRange( 0, 0 );
     polygonPoints = polygon.geometry.attributes.position.array;
     scene.add( polygon );
 }
 
 function initLine(){
-    line = createGeometry(2);
+    line = createLineGeometry(2);
     line.geometry.setDrawRange( 0, 2 );
     linePoints = line.geometry.attributes.position.array;
     scene.add(line);
 }
 
-function createGeometry(point_count){
+function createLineGeometry(point_count){
     const geometry = new THREE.BufferGeometry();
 
     const positions = new Float32Array( point_count * 3 );
@@ -206,9 +277,7 @@ function createGeometry(point_count){
     return line;
 }
 
-function addPoint(point){
-    isLineActive = true;
-    
+function addPoint(point){    
     polygonPoints[curPolygonIndex ++ ] = point.x;
     polygonPoints[curPolygonIndex ++ ] = point.y;
     polygonPoints[curPolygonIndex ++ ] = 0;
