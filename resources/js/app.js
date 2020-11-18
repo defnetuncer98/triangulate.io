@@ -18,6 +18,8 @@ var isButtonClicked = false;
 var convexHull = new THREE.Vector3();
 var convexHullIndex;
 var distanceThreshold = 2;
+var diagonals = [];
+var graph = [];
 
 const colorPalette_01 = 0xffffff;
 const colorPalette_02 = 0x6495ED;
@@ -114,6 +116,23 @@ function onClickedButton(){
 
 function triangulate(){
     findDiagonals();
+
+    createGraph();
+
+    console.log(graph);
+}
+
+function createGraph(){
+    for(i=0; i<diagonals.length; i++) graph.push([]);
+
+    for(i=0; i<diagonals.length; i++){
+        for(j=i; j<diagonals.length; j++){
+            if(isIntersecting(diagonals[i], diagonals[j])){
+                graph[i].push(j);
+                graph[j].push(i);
+            }
+        }
+    }
 }
 
 function findConvexHull(){
@@ -154,9 +173,11 @@ function findDiagonals(){
                 continue;
 
             if(isConvex && isLeft(diagonal, trio.a) && isRight(diagonal, trio.c)){
+                diagonals.push(diagonal);
                 drawDiagonal(diagonal);
             }
             else if(!isConvex && !(isLeft(diagonal, trio.c) && isRight(diagonal, trio.a))){
+                diagonals.push(diagonal);
                 drawDiagonal(diagonal);
             }
         }
