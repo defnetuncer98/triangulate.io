@@ -126,13 +126,15 @@ function createGraph(){
     for(i=0; i<diagonals.length; i++) graph.push([]);
 
     for(i=0; i<diagonals.length; i++){
-        for(j=i; j<diagonals.length; j++){
+        for(j=i+1; j<diagonals.length; j++){//?
             if(isIntersecting(diagonals[i], diagonals[j])){
                 graph[i].push(j);
                 graph[j].push(i);
+                console.log("hi");
             }
         }
     }
+    console.log(graph);
 }
 
 function twoColorGraph(){
@@ -149,7 +151,7 @@ function twoColorGraph(){
             coloredNodeCount++;
 
             for(j=0;j<graph[i].length; j++){
-                coloredIndices[j] = 1;
+                coloredIndices[graph[i][j]] = 1;
                 coloredNodeCount++;
             }
 
@@ -172,7 +174,7 @@ function findDiagonals(){
         isConvex = findAngle(startIndex, orientation);
         var trio = new Trio(startIndex, orientation);
 
-        for(j=i; j<getPointCount(); j++){
+        for(j=i+1; j<getPointCount(); j++){//?
             endIndex = j*3;
             if(endIndex==startIndex || endIndex==getNextIndex(startIndex) || endIndex==getPreviousIndex(startIndex))
                 continue;
@@ -212,7 +214,13 @@ function xor(bool1, bool2){
 }
 
 function isIntersecting(line1, line2){
+    //if(isSamePoint(line1.start,line2.start) || isSamePoint(line1.start,line2.end) || isSamePoint(line1.end,line2.start) || isSamePoint(line1.end,line2.end))
+        //return false;
     return xor(isLeft(line1, line2.start), isLeft(line1, line2.end)) && xor(isLeft(line2, line1.start), isLeft(line2, line1.end));
+}
+
+function isSamePoint(point1, point2){
+    return point1.x==point2.x && point1.y==point2.y;
 }
 
 function Trio(index, orientation){
