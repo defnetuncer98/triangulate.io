@@ -18,7 +18,6 @@ var isButtonClicked = false;
 var convexHull = new THREE.Vector3();
 var convexHullIndex;
 var distanceThreshold = 2;
-var diagonals = [];
 
 const colorPalette_01 = 0xffffff;
 const colorPalette_02 = 0x6495ED;
@@ -132,12 +131,16 @@ function findDiagonals(){
         
         var trio = new Trio(startIndex, orientation);
 
-        for(j=i; j<getPointCount(); j++){
+        for(j=0; j<getPointCount(); j++){
             endIndex = j*3;
-            if(endIndex==getNextIndex(startIndex) || endIndex==getPreviousIndex(startIndex))
+            if(endIndex==startIndex || endIndex==getNextIndex(startIndex) || endIndex==getPreviousIndex(startIndex))
                 continue;
 
             var line = new THREE.Line3(trio.b, getPoint(endIndex));
+            
+            if(isCrossingEdge(line))
+                continue;
+
             if(isConvex && isLeft(line, trio.a) && isRight(line, trio.c)){
                 drawDiagonal(line);
             }
@@ -146,6 +149,20 @@ function findDiagonals(){
             }
         }
     }
+}
+
+function isCrossingEdge(line){
+    for(i=0; i<getPointCount(); i++){
+        startIndex = i*3;
+        var trio = new Trio(startIndex, true);
+        if(isIntersecting(line, new THREE.Line3(trio.a-trio.b)) || isIntersecting(line, new THREE.Line3(trio.c-trio.b)))
+            return true;
+    }
+    return false;
+}
+
+function isIntersecting(line1, line2){
+    return (isLeft(line1, line2.start) ^ isLeft(line1, line2.end)) && (isLeft(line2, line1.start) ^ isLeft(line2, line1.end));
 }
 
 function Trio(index, orientation){
