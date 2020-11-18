@@ -119,7 +119,7 @@ function triangulate(){
 
     createGraph();
 
-    console.log(graph);
+    twoColorGraph();
 }
 
 function createGraph(){
@@ -131,6 +131,29 @@ function createGraph(){
                 graph[i].push(j);
                 graph[j].push(i);
             }
+        }
+    }
+}
+
+function twoColorGraph(){
+    var coloredIndices = [];
+    for(i=0; i<graph.length; i++) coloredIndices.push(0);
+    var coloredNodeCount = 0;
+    while(coloredNodeCount < graph.length){
+        for(i=0; i<graph.length; i++){
+            if(coloredIndices[i]!=0)
+                continue;
+            
+            drawDiagonal(diagonals[i]);
+            coloredIndices[i] = 1;
+            coloredNodeCount++;
+
+            for(j=0;j<graph[i].length; j++){
+                coloredIndices[j] = 1;
+                coloredNodeCount++;
+            }
+
+            break;
         }
     }
 }
@@ -174,11 +197,11 @@ function findDiagonals(){
 
             if(isConvex && isLeft(diagonal, trio.a) && isRight(diagonal, trio.c)){
                 diagonals.push(diagonal);
-                drawDiagonal(diagonal);
+                //drawDiagonal(diagonal);
             }
             else if(!isConvex && !(isLeft(diagonal, trio.c) && isRight(diagonal, trio.a))){
                 diagonals.push(diagonal);
-                drawDiagonal(diagonal);
+                //drawDiagonal(diagonal);
             }
         }
     }
