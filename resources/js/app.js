@@ -128,41 +128,47 @@ function findDiagonals(){
     for(i=0; i<getPointCount(); i++){
         startIndex = i*3;
         isConvex = findAngle(startIndex, orientation);
-        
         var trio = new Trio(startIndex, orientation);
 
-        for(j=0; j<getPointCount(); j++){
+        for(j=i; j<getPointCount(); j++){
             endIndex = j*3;
             if(endIndex==startIndex || endIndex==getNextIndex(startIndex) || endIndex==getPreviousIndex(startIndex))
                 continue;
 
-            var line = new THREE.Line3(trio.b, getPoint(endIndex));
+            var diagonal = new THREE.Line3(trio.b, getPoint(endIndex));
             
-            if(isCrossingEdge(line))
+            var intersectionFound = false;
+            for(k=0; k<getPointCount(); k++){
+                var index = k*3;
+                if(index == startIndex || index == endIndex || endIndex==getNextIndex(index) || startIndex==getNextIndex(index) )
+                    continue;
+                    
+                var trio2 = new Trio(index, true);
+                if(isIntersecting(diagonal, new THREE.Line3(trio2.c, trio2.b))){
+                    intersectionFound = true;
+                    break;
+                }
+            }
+
+            if(intersectionFound)
                 continue;
 
-            if(isConvex && isLeft(line, trio.a) && isRight(line, trio.c)){
-                drawDiagonal(line);
+            if(isConvex && isLeft(diagonal, trio.a) && isRight(diagonal, trio.c)){
+                drawDiagonal(diagonal);
             }
-            else if(!isConvex && isLeft(line, trio.c) && isRight(line, trio.a)){
-                drawDiagonal(line);
+            else if(!isConvex && !(isLeft(diagonal, trio.c) && isRight(diagonal, trio.a))){
+                drawDiagonal(diagonal);
             }
         }
     }
 }
 
-function isCrossingEdge(line){
-    for(i=0; i<getPointCount(); i++){
-        startIndex = i*3;
-        var trio = new Trio(startIndex, true);
-        if(isIntersecting(line, new THREE.Line3(trio.a-trio.b)) || isIntersecting(line, new THREE.Line3(trio.c-trio.b)))
-            return true;
-    }
-    return false;
+function xor(bool1, bool2){
+    return bool1 != bool2;
 }
 
 function isIntersecting(line1, line2){
-    return (isLeft(line1, line2.start) ^ isLeft(line1, line2.end)) && (isLeft(line2, line1.start) ^ isLeft(line2, line1.end));
+    return xor(isLeft(line1, line2.start), isLeft(line1, line2.end)) && xor(isLeft(line2, line1.start), isLeft(line2, line1.end));
 }
 
 function Trio(index, orientation){
