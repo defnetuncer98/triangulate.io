@@ -22,6 +22,7 @@ var diagonals = [];
 
 const colorPalette_01 = 0xffffff;
 const colorPalette_02 = 0x6495ED;
+const colorPalette_03 = 0x7FFF00;
 
 const cursor = document.getElementById('cursor-container');
 const container = document.getElementById('canvas-wrap');
@@ -30,8 +31,9 @@ const triangulationInfo = document.getElementById("triangulationInfo");
 
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-const lineBasicMaterial = new THREE.LineBasicMaterial( { color: colorPalette_01 } );
-const lineBasicMaterial_Colored = new THREE.LineBasicMaterial( { color: colorPalette_02 } );
+const lineBasicMaterial_01 = new THREE.LineBasicMaterial( { color: colorPalette_01, transparent: true, opacity : 0.3 } );
+const lineBasicMaterial_02 = new THREE.LineBasicMaterial( { color: colorPalette_02 } );
+const lineBasicMaterial_03 = new THREE.LineBasicMaterial( { color: colorPalette_03 } );
 const matLite = new THREE.MeshBasicMaterial( {
     color: 0xffffff,
     transparent: true,
@@ -128,26 +130,32 @@ function findDiagonals(){
         startIndex = i*3;
         isConvex = findAngle(startIndex, orientation);
         
-        var a = getPoint(getPreviousIndex(startIndex));
-        var b = getPoint(startIndex);
-        var c = getPoint(getNextIndex(startIndex));
-
-        if(!orientation){
-            c = getPoint(getPreviousIndex(startIndex));
-            a = getPoint(getNextIndex(startIndex));
-        }
+        var trio = new Trio(startIndex, orientation);
 
         for(j=i; j<getPointCount(); j++){
             endIndex = j*3;
             if(endIndex==getNextIndex(startIndex) || endIndex==getPreviousIndex(startIndex))
                 continue;
 
-            var line = new THREE.Line3(b, getPoint(endIndex));
-            if(isConvex && isLeft(line, a) && isRight(line, c))
-                diagonals.push(line);
-            else if(!isConvex && isLeft(line, c) && isRight(line, a))
-                diagonals.push(line);
+            var line = new THREE.Line3(trio.b, getPoint(endIndex));
+            if(isConvex && isLeft(line, trio.a) && isRight(line, trio.c)){
+                drawDiagonal(line);
+            }
+            else if(!isConvex && isLeft(line, trio.c) && isRight(line, trio.a)){
+                drawDiagonal(line);
+            }
         }
+    }
+}
+
+function Trio(index, orientation){
+    this.a = getPoint(getPreviousIndex(index));
+    this.b = getPoint(index);
+    this.c = getPoint(getNextIndex(index));
+
+    if(!orientation){
+        this.c = getPoint(getPreviousIndex(index));
+        this.a = getPoint(getNextIndex(index));
     }
 }
 
@@ -160,22 +168,20 @@ function isRight(line, p){
 }
 
 function findAngle(index, orientation){
-    var a = getPoint(getPreviousIndex(index));
-    var b = getPoint(index);
-    var c = getPoint(getNextIndex(index));
+    var trio = new Trio(index, orientation);
 
     var dir1 = new THREE.Vector3();
-    dir1.subVectors( a, b ).normalize();
+    dir1.subVectors( trio.a, trio.b ).normalize();
 
     var dir2 = new THREE.Vector3();
-    dir2.subVectors( c, b ).normalize();
+    dir2.subVectors( trio.c, trio.b ).normalize();
 
     var angle = THREE.MathUtils.radToDeg(dir1.angleTo(dir2));
 
     if(orientation != findDeterminant(index))
         angle = 360-angle;
 
-    var textPos = new THREE.Vector3(b.x, b.y - 20, b.z);
+    var textPos = new THREE.Vector3(trio.b.x, trio.b.y - 20, trio.b.z);
     loadText(parseInt(angle)+"", textPos);
 
     return angle<180;
@@ -192,10 +198,8 @@ function findOrientation(){
 }
 
 function findDeterminant(index){
-    var a = getPoint(getPreviousIndex(index));
-    var b = getPoint(index);
-    var c = getPoint(getNextIndex(index));
-    const det = (b.x*c.y + a.x*b.y + a.y*c.x) - (a.y*b.x + b.y*c.x + a.x*c.y);
+    var trio = new Trio(index, true);
+    const det = (trio.b.x*trio.c.y + trio.a.x*trio.b.y + trio.a.y*trio.c.x) - (trio.a.y*trio.b.x + trio.b.y*trio.c.x + trio.a.x*trio.c.y);
     return det>0;
 }
 
@@ -343,13 +347,26 @@ function initLine(){
     scene.add(line);
 }
 
-function createLineGeometry(point_count){
+function drawDiagonal(d){
+    var diagonal = createLineGeometry(2, lineBasicMaterial_03);
+    diagonal.geometry.setDrawRange( 0, 2 );
+    const diagonalPoints = diagonal.geometry.attributes.position.array;
+    diagonalPoints[0] = d.start.x;
+    diagonalPoints[1] = d.start.y;
+    diagonalPoints[2] = d.start.z;
+    diagonalPoints[3] = d.end.x
+    diagonalPoints[4] = d.end.y;
+    diagonalPoints[5] = d.end.z;
+    scene.add(diagonal);
+}
+
+function createLineGeometry(point_count, mat = lineBasicMaterial_02){
     const geometry = new THREE.BufferGeometry();
 
     const positions = new Float32Array( point_count * 3 );
     geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
-    const line = new THREE.Line( geometry,  lineBasicMaterial_Colored );
+    const line = new THREE.Line( geometry,  mat );
 
     const points = line.geometry.attributes.position.array;
 
@@ -375,7 +392,7 @@ function addPoint(){
 }
 
 function connectPolygon(){
-    line.material = lineBasicMaterial_Colored;
+    line.material = lineBasicMaterial_02;
 
     const lastPoint = getLastPoint();
 
@@ -407,7 +424,7 @@ function getFirstPoint(){
 }
 
 function updateLine(){
-    line.material = lineBasicMaterial;
+    line.material = lineBasicMaterial_01;
 
     const lastPoint = getLastPoint();
 
