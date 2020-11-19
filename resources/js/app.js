@@ -126,7 +126,7 @@ function createGraph(){
     for(i=0; i<diagonals.length; i++) graph.push([]);
 
     for(i=0; i<diagonals.length; i++){
-        for(j=i+1; j<diagonals.length; j++){//?
+        for(j=i+1; j<diagonals.length; j++){
             if(isIntersecting(diagonals[i], diagonals[j])){
                 graph[i].push(j);
                 graph[j].push(i);
@@ -154,8 +154,6 @@ function twoColorGraph(){
                 coloredIndices[graph[i][j]] = 1;
                 coloredNodeCount++;
             }
-
-            break;
         }
     }
 }
@@ -171,24 +169,24 @@ function findDiagonals(){
 
     for(i=0; i<getPointCount(); i++){
         startIndex = i*3;
+        var startPoint = getPoint(startIndex);
         isConvex = findAngle(startIndex, orientation);
         var trio = new Trio(startIndex, orientation);
 
-        for(j=i+1; j<getPointCount(); j++){//?
+        for(j=i+2; j<getPointCount(); j++){
             endIndex = j*3;
-            if(endIndex==startIndex || endIndex==getNextIndex(startIndex) || endIndex==getPreviousIndex(startIndex))
+            var endPoint = getPoint(endIndex);
+
+            if(isSamePoint(trio.a, endPoint) || isSamePoint(trio.c, endPoint))
                 continue;
 
-            var diagonal = new THREE.Line3(trio.b, getPoint(endIndex));
+            var diagonal = new THREE.Line3(startPoint, endPoint);
             
             var intersectionFound = false;
             for(k=0; k<getPointCount(); k++){
-                var index = k*3;
-                if(index == startIndex || index == endIndex || endIndex==getNextIndex(index) || startIndex==getNextIndex(index) )
-                    continue;
-                    
-                var trio2 = new Trio(index, true);
-                if(isIntersecting(diagonal, new THREE.Line3(trio2.c, trio2.b))){
+                var trio2 = new Trio(k*3, true);
+
+                if(isIntersecting(diagonal, new THREE.Line3(trio2.b, trio2.c))){
                     intersectionFound = true;
                     break;
                 }
@@ -214,8 +212,8 @@ function xor(bool1, bool2){
 }
 
 function isIntersecting(line1, line2){
-    //if(isSamePoint(line1.start,line2.start) || isSamePoint(line1.start,line2.end) || isSamePoint(line1.end,line2.start) || isSamePoint(line1.end,line2.end))
-        //return false;
+    if(isSamePoint(line1.start,line2.start) || isSamePoint(line1.start,line2.end) || isSamePoint(line1.end,line2.start) || isSamePoint(line1.end,line2.end))
+        return false;
     return xor(isLeft(line1, line2.start), isLeft(line1, line2.end)) && xor(isLeft(line2, line1.start), isLeft(line2, line1.end));
 }
 
