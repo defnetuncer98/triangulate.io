@@ -130,7 +130,6 @@ function createGraph(){
             if(isIntersecting(diagonals[i], diagonals[j])){
                 graph[i].push(j);
                 graph[j].push(i);
-                console.log("hi");
             }
         }
     }
