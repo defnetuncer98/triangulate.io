@@ -9,12 +9,15 @@
 	</head>
 	<body>
 		<div class="gridcontainer">
-			<div class="griditem1">triangulateMe</div>
-			<div class="griditem2">Polygon Triangulation by Graph Coloring</div>
+			<div class="griditem1 section">triangulateMe</div>
+			<div class="griditem2 subtitle">Polygon Triangulation by Graph Coloring</div>
+			<div id="step1" class="griditem3 section">STEP 1 | Find Orientation</div>
 			<button id="triangulateMe" type="button" onclick="onClickedButton()" onmouseenter="onEnteredButton()" onmouseleave="onLeftButton()">Ready?</button>
-			<div id="triangulationInfo"></div>
+			<div id="triangulationInfo" class="subtitle"></div>
 		</div>
-		<div id="canvas-wrap"></div>
+		<div id="input-canvas"></div>
+		<div id="canvas-2"></div>
+		<div id="canvas-3"></div>
 		<div id="cursor-container">
 			<image id="cursor" src="resources/images/cursor.gif"></image>
 		</div>

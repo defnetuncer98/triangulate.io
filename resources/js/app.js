@@ -1,8 +1,14 @@
-var canvas;
+var inputCanvas;
+var canvas2;
+var canvas3;
 var camera;
-var scene;
+var inputScene;
+var scene2;
+var scene3;
 var clock;
-var renderer;
+var inputSceneRenderer;
+var scene2Renderer;
+var scene3Renderer;
 var input = new THREE.Vector2();
 var mouse = new THREE.Vector2();
 var raycaster = new THREE.Raycaster();
@@ -26,7 +32,9 @@ const colorPalette_02 = 0x6495ED;
 const colorPalette_03 = 0x7FFF00;
 
 const cursor = document.getElementById('cursor-container');
-const container = document.getElementById('canvas-wrap');
+const inputContainer = document.getElementById('input-canvas');
+const container2 = document.getElementById('canvas-2');
+const container3 = document.getElementById('canvas-3');
 const triangulateMe = document.getElementById("triangulateMe");
 const triangulationInfo = document.getElementById("triangulationInfo");
 
@@ -81,10 +89,12 @@ function initScene(){
     camera.position.set( 0, 0, 0);
     camera.lookAt( 0, 0, 0 );
     
-    scene = new THREE.Scene();
+    inputScene = new THREE.Scene();
+    scene2 = new THREE.Scene();
+    scene3 = new THREE.Scene();
     clock = new THREE.Clock();
 
-    window.addEventListener( 'resize', onWindowResize, false );
+    //window.addEventListener( 'resize', onWindowResize, false );
     window.addEventListener( 'click', onDocumentMouseClick, false );
     window.addEventListener( 'mousemove', onDocumentMouseMove, false );
 }
@@ -111,10 +121,19 @@ function onClickedButton(){
     isButtonClicked = true;
     triangulateMe.style.visibility = 'hidden';
 
+    document.body.style.overflowY = 'scroll';
+
+    scene2.add(polygon.clone());
+    scene2.add(line.clone());
+    scene3.add(polygon.clone());
+    scene3.add(line.clone());
+
     triangulate();
 }
 
 function triangulate(){
+    document.getElementById("step1").style.visibility = 'visible';
+
     findDiagonals();
 
     createGraph();
@@ -145,7 +164,7 @@ function twoColorGraph(){
             if(coloredIndices[i]!=0)
                 continue;
             
-            drawDiagonal(diagonals[i]);
+            drawDiagonal(diagonals[i], scene3);
             coloredIndices[i] = 1;
             coloredNodeCount++;
 
@@ -158,7 +177,7 @@ function twoColorGraph(){
 }
 
 function findConvexHull(){
-    triangulationInfo.innerHTML += "ConvexHull: " + letters[convexHullIndex / 3] + "<br />";
+    triangulationInfo.innerHTML += "Convex Hull: " + letters[convexHullIndex / 3] + "<br />";
 }
 
 function findDiagonals(){
@@ -196,11 +215,11 @@ function findDiagonals(){
 
             if(isConvex && isLeft(diagonal, trio.a) && isRight(diagonal, trio.c)){
                 diagonals.push(diagonal);
-                //drawDiagonal(diagonal);
+                drawDiagonal(diagonal, scene2);
             }
             else if(!isConvex && !(isLeft(diagonal, trio.c) && isRight(diagonal, trio.a))){
                 diagonals.push(diagonal);
-                //drawDiagonal(diagonal);
+                drawDiagonal(diagonal, scene2);
             }
         }
     }
@@ -254,7 +273,7 @@ function findAngle(index, orientation){
         angle = 360-angle;
 
     var textPos = new THREE.Vector3(trio.b.x, trio.b.y - 20, trio.b.z);
-    loadText(parseInt(angle)+"", textPos);
+    loadText(parseInt(angle)+"", textPos, scene2);
 
     return angle<180;
 }
@@ -311,7 +330,7 @@ function onDocumentMouseClick( event ) {
     tryFindConvexHull();
 
     var textPos = new THREE.Vector3(input.x, input.y + 10, input.z);
-    loadText(letters[getPointCount()-1], textPos);
+    loadText(letters[getPointCount()-1], textPos, inputScene);
 }
 
 function onDocumentMouseMove( event ) {
@@ -340,7 +359,7 @@ function updateConvexHull(){
     convexHullIndex = curPolygonIndex - 3;
 }
 
-function loadText(text, pos){
+function loadText(text, pos, scene){
     var loader = new THREE.FontLoader();
     loader.load( './resources/fonts/Roboto_Regular.json', function ( font ) {
         scene.add( createText(font, text, pos.x, pos.y, pos.z));
@@ -380,46 +399,74 @@ function getPointCount(){
 }
 
 function initRenderer(){
-    canvas = document.createElement( 'canvas' );
-    var context = canvas.getContext( 'webgl2', { alpha: true } );
-    renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context, antialias:true } );
-    renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    inputCanvas = document.createElement( 'canvas' );
+    var context = inputCanvas.getContext( 'webgl2', { alpha: true } );
+    inputSceneRenderer = new THREE.WebGLRenderer( { canvas: inputCanvas, context: context, antialias:true } );
+    inputSceneRenderer.setPixelRatio( window.devicePixelRatio );
+    inputSceneRenderer.setSize( window.innerWidth, window.innerHeight );
 
     //renderer.toneMapping = THREE.ACESFilmicToneMapping;
     //renderer.toneMappingExposure = 0.8;    
-    renderer.outputEncoding = THREE.sRGBEncoding;
+    inputSceneRenderer.outputEncoding = THREE.sRGBEncoding;
     
-    container.appendChild(renderer.domElement);
+    inputContainer.appendChild(inputSceneRenderer.domElement);
+
+    canvas2 = document.createElement( 'canvas' );
+    var context = canvas2.getContext( 'webgl2', { alpha: true } );
+    scene2Renderer = new THREE.WebGLRenderer( { canvas: canvas2, context: context, antialias:true } );
+    scene2Renderer.setPixelRatio( window.devicePixelRatio );
+    scene2Renderer.setSize( window.innerWidth, window.innerHeight );
+
+    //renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    //renderer.toneMappingExposure = 0.8;    
+    scene2Renderer.outputEncoding = THREE.sRGBEncoding;
+    
+    container2.appendChild(scene2Renderer.domElement);
+
+    canvas3 = document.createElement( 'canvas' );
+    var context = canvas3.getContext( 'webgl2', { alpha: true } );
+    scene3Renderer = new THREE.WebGLRenderer( { canvas: canvas3, context: context, antialias:true } );
+    scene3Renderer.setPixelRatio( window.devicePixelRatio );
+    scene3Renderer.setSize( window.innerWidth, window.innerHeight );
+
+    //renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    //renderer.toneMappingExposure = 0.8;    
+    scene3Renderer.outputEncoding = THREE.sRGBEncoding;
+    
+    container3.appendChild(scene3Renderer.domElement);
 }
 
+/*
 function onWindowResize(){
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    inputSceneRenderer.setSize( window.innerWidth, window.innerHeight );
 }
+*/
 
 function animate() {
     var delta = clock.getDelta();
     requestAnimationFrame( animate );
-    renderer.render(scene, camera);
+    inputSceneRenderer.render(inputScene, camera);
+    scene2Renderer.render(scene2, camera);
+    scene3Renderer.render(scene3, camera);
 }
 
 function initPolygon(){
     polygon = createLineGeometry(500);
     polygon.geometry.setDrawRange( 0, 0 );
     polygonPoints = polygon.geometry.attributes.position.array;
-    scene.add( polygon );
+    inputScene.add( polygon );
 }
 
 function initLine(){
     line = createLineGeometry(2);
     line.geometry.setDrawRange( 0, 2 );
     linePoints = line.geometry.attributes.position.array;
-    scene.add(line);
+    inputScene.add(line);
 }
 
-function drawDiagonal(d){
+function drawDiagonal(d, scene){
     var diagonal = createLineGeometry(2, lineBasicMaterial_03);
     diagonal.geometry.setDrawRange( 0, 2 );
     const diagonalPoints = diagonal.geometry.attributes.position.array;
