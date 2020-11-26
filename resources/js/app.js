@@ -137,6 +137,7 @@ function triangulate(){
     document.getElementById("step1").style.visibility = 'visible';
     document.getElementById("step2").style.visibility = 'visible';
     document.getElementById("step3").style.visibility = 'visible';
+    document.getElementById("swipeup").style.visibility = 'visible';
 
     findDiagonals();
 

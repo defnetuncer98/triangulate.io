@@ -134,3 +134,11 @@ canvas {
     grid-row-start: 33;
     z-index: 2;
 }
+
+#swipeup{
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    width: 60px;
+    visibility: hidden;
+}
