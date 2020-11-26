@@ -37,6 +37,8 @@ const container2 = document.getElementById('canvas-2');
 const container3 = document.getElementById('canvas-3');
 const triangulateMe = document.getElementById("triangulateMe");
 const triangulationInfo = document.getElementById("triangulationInfo");
+const triangulationInfo2 = document.getElementById("triangulationInfo2");
+const triangulationInfo3 = document.getElementById("triangulationInfo3");
 
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -176,14 +178,26 @@ function twoColorGraph(){
             }
         }
     }
+
+    triangulationInfo3.innerHTML += `After finding all diagonals that are internal and not crossing any edge,
+    the graph is constructed which for each <b>diagonal</b> of the polygon, there is a corresponding <b>node</b> in the graph
+    and for <b>every pair of intersecting diagonals</b>, there is an <b>edge</b> between the corresponding graph nodes.
+    An adjacency matrix is used to represent the graph where a key keeps an index of a diagonal and it's
+    value is the list of indices of diagonals that it intersects with.
+    <br><br>Steps to two-color graph:
+    <br> Randomly choose an uncolored node, u
+    <br> Color u as <b>white</b>
+    <br> Color all neighbors of u as <b>black</b>
+    <br> Repeat until all nodes are colored
+    <br><br> White nodes are now our triangulation!`;
 }
 
 function findConvexHull(){
     
-    triangulationInfo.innerHTML += `Approach: When traveling on a <b>counter-clockwise oriented simple polygon</b> one always has the curve interior to the left.
+    triangulationInfo.innerHTML += `Approach: When traveling on a <b>counter-clockwise oriented simple polygon</b>one always has the curve interior to the left.
     <br/> <br/> Therefore the orientation of a simple polygon is related to the <b>sign of the angle</b> at any vertex of the convex hull of the polygon.
     <br/> <br/> Using this fact rigthmost vertex is found and orientation is calculated.
-    <br/> <br/> <br/>`;
+    <br/> <br/> `;
 
     triangulationInfo.innerHTML += "Rightmost Vertex: " + letters[convexHullIndex / 3] + "<br/>";
 }
@@ -208,6 +222,8 @@ function findDiagonals(){
 
             var diagonal = new THREE.Line3(startPoint, endPoint);
             
+            drawDiagonal(diagonal, inputScene);
+
             var intersectionFound = false;
             for(k=0; k<getPointCount(); k++){
                 var trio2 = new Trio(k*3, true);
@@ -231,6 +247,16 @@ function findDiagonals(){
             }
         }
     }
+
+    triangulationInfo2.innerHTML += `
+    Approach: A potential diagonal of the polygon have two features: having both ends internal and not intersecting with an edge. For all diagonals below steps are performed.
+    <br/> <br/> <b>Convex or Reflex?</b>
+    The angle is marked as reflex if it's sign is negative and convex otherwise. 
+    <br/> <br/> <b>Is Internal?</b>
+    Assuming the angle is convex and polygon is oriented counter-clockwise, point's left neighbor point should be on diagonal's left side and it's right neighbor should be on diagonal's right.
+    <br/> <br/> <b>Intersecting with Edges?</b>
+    If the diagonal is found to be internal, it should now be checked to see if it intersects with any of the edges of the polygon.
+    `;
 }
 
 function xor(bool1, bool2){
