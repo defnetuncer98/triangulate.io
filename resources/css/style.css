@@ -39,7 +39,7 @@ canvas {
 .gridcontainer {
     position: absolute;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(10, 1fr);
     grid-template-rows: repeat(4, 1fr);
     grid-row-gap: 10px;
 }
@@ -74,7 +74,27 @@ canvas {
     grid-row-start: 7;
 }
 
+.griditem4 {
+    grid-column-start: 2;
+    grid-column-end: span 4;
+    grid-row-start: 20;
+}
+
+.griditem5 {
+    grid-column-start: 2;
+    grid-column-end: span 4;
+    grid-row-start: 100;
+}
+
 #step1 {
+    visibility: hidden;
+}
+
+#step2 {
+    visibility: hidden;
+}
+
+#step3 {
     visibility: hidden;
 }
 
@@ -98,8 +118,7 @@ canvas {
 }
 
 #triangulationInfo{
-    grid-column-start: 2;
-    grid-column-end: span 4;
+    grid-column: 2 / 5;
     grid-row-start: 10;
     z-index: 2;
 }

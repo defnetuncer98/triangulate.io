@@ -133,6 +133,8 @@ function onClickedButton(){
 
 function triangulate(){
     document.getElementById("step1").style.visibility = 'visible';
+    document.getElementById("step2").style.visibility = 'visible';
+    document.getElementById("step3").style.visibility = 'visible';
 
     findDiagonals();
 
@@ -177,7 +179,13 @@ function twoColorGraph(){
 }
 
 function findConvexHull(){
-    triangulationInfo.innerHTML += "Convex Hull: " + letters[convexHullIndex / 3] + "<br />";
+    
+    triangulationInfo.innerHTML += `Approach: When traveling on a <b>counter-clockwise oriented simple polygon</b> one always has the curve interior to the left.
+    <br/> <br/> Therefore the orientation of a simple polygon is related to the <b>sign of the angle</b> at any vertex of the convex hull of the polygon.
+    <br/> <br/> Using this fact rigthmost vertex is found and orientation is calculated.
+    <br/> <br/> <br/>`;
+
+    triangulationInfo.innerHTML += "Rightmost Vertex: " + letters[convexHullIndex / 3] + "<br/>";
 }
 
 function findDiagonals(){
@@ -281,9 +289,11 @@ function findAngle(index, orientation){
 function findOrientation(){
     const orientation = findDeterminant(convexHullIndex);
     if(orientation)
-        triangulationInfo.innerHTML += "Orientation: Counter Clockwise <br />";
+        triangulationInfo.innerHTML += "Orientation: Counter Clockwise <br/>";
     else
-        triangulationInfo.innerHTML += "Orientation: Clockwise <br />";
+        triangulationInfo.innerHTML += "Orientation: Clockwise <br/>";
+
+    triangulationInfo.innerHTML += "Calculation Time Complexity: O(n) <br/>";
 
     return orientation;
 }
@@ -379,7 +389,7 @@ function createText(font, message, x, y, z, size=12, mat=matLite){
 }
 
 function tryFindConvexHull(){
-    if(input.x < convexHull.x)
+    if(input.x > convexHull.x)
         updateConvexHull();
     else if(convexHull.x == input.x && input.y < convexHull.y)
         updateConvexHull();
