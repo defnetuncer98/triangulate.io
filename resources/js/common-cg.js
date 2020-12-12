@@ -73,7 +73,7 @@ function findAngle(trio, orientation){
         angle = 360-angle;
 
     var textPos = new THREE.Vector3(trio.b.x, trio.b.y - 20, trio.b.z);
-    drawText(parseInt(angle)+"", textPos, scene2);
+    drawText(parseInt(angle)+"", textPos, scenes[1]);
 
     return angle<180;
 }

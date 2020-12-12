@@ -15,15 +15,16 @@ class Polygon {
             if(point.x > convexHull.x){
                 convexHull.x = point.x;
                 convexHull.y = point.y;
-                convexHullIndex = i;
+                convexHullIndex = i*3;
             }
             else if(convexHull.x == point.x && point.y < convexHull.y){
                 convexHull.x = point.x;
                 convexHull.y = point.y;
-                convexHullIndex = i;
+                convexHullIndex = i*3;
             }
         }
-
+        console.log(convexHullIndex);
+        console.log(convexHullIndex/3);
         return convexHullIndex;
     }
 

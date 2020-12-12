@@ -1,14 +1,8 @@
-var inputCanvas;
-var canvas2;
-var canvas3;
 var camera;
-var inputScene;
-var scene2;
-var scene3;
-var clock;
-var inputSceneRenderer;
-var scene2Renderer;
-var scene3Renderer;
+
+var canvases = [];
+var scenes = [];
+var renderers = [];
 
 var polygon;
 var line;
@@ -48,12 +42,12 @@ animate();
 
 function init(){
     initRenderer();
-    initScene();
+    initScene(3);
     initPolygon();
     initLine();
 }
 
-function initScene(){
+function initScene(sceneCount){
     var w = window.innerWidth;
     var h = window.innerHeight;
     var aspectRatio = w / h;
@@ -82,10 +76,8 @@ function initScene(){
     camera.position.set( 0, 0, 0);
     camera.lookAt( 0, 0, 0 );
     
-    inputScene = new THREE.Scene();
-    scene2 = new THREE.Scene();
-    scene3 = new THREE.Scene();
-    clock = new THREE.Clock();
+    for(var i=0; i<sceneCount; i++)
+        scenes.push(new THREE.Scene());
 
     //window.addEventListener( 'resize', onWindowResize, false );
     window.addEventListener( 'click', onDocumentMouseClick, false );
@@ -116,10 +108,10 @@ function onClickedButton(){
 
     document.body.style.overflowY = 'scroll';
 
-    scene2.add(polygon.polygon.clone());
-    scene2.add(line.line.clone());
-    scene3.add(polygon.polygon.clone());
-    scene3.add(line.line.clone());
+    scenes[1].add(polygon.polygon.clone());
+    scenes[1].add(line.line.clone());
+    scenes[2].add(polygon.polygon.clone());
+    scenes[2].add(line.line.clone());
 
     triangulate();
 }
@@ -148,7 +140,6 @@ function createGraph(){
             }
         }
     }
-    console.log(graph);
 }
 
 function twoColorGraph(){
@@ -160,7 +151,7 @@ function twoColorGraph(){
             if(coloredIndices[i]!=0)
                 continue;
             
-            drawLine(diagonals[i], scene3);
+            drawLine(diagonals[i], scenes[2]);
             coloredIndices[i] = 1;
             coloredNodeCount++;
 
@@ -214,7 +205,7 @@ function findDiagonals(){
 
             var diagonal = new THREE.Line3(startPoint, endPoint);
             
-            drawLine(diagonal, inputScene);
+            drawLine(diagonal, scenes[0]);
 
             var intersectionFound = false;
             for(k=0; k<polygon.getPointCount(); k++){
@@ -231,11 +222,11 @@ function findDiagonals(){
 
             if(isConvex && isLeft(diagonal, trio.a) && isRight(diagonal, trio.c)){
                 diagonals.push(diagonal);
-                drawLine(diagonal, scene2);
+                drawLine(diagonal, scenes[1]);
             }
             else if(!isConvex && !(isLeft(diagonal, trio.c) && isRight(diagonal, trio.a))){
                 diagonals.push(diagonal);
-                drawLine(diagonal, scene2);
+                drawLine(diagonal, scenes[1]);
             }
         }
     }
@@ -276,7 +267,7 @@ function onDocumentMouseClick( event ) {
     tryEnableButton();
 
     var textPos = new THREE.Vector3(input.x, input.y + 10, input.z);
-    drawText(letters[polygon.getPointCount()-1], textPos, inputScene, './resources/fonts/Roboto_Regular.json', matLite);
+    drawText(letters[polygon.getPointCount()-1], textPos, scenes[0], './resources/fonts/Roboto_Regular.json', matLite);
 }
 
 function onDocumentMouseMove( event ) {
@@ -299,68 +290,54 @@ function canTriangulate(){
     return polygon.getPointCount()>=3;
 }
 
+
+function addRenderer(container){
+    var canvas = document.createElement( 'canvas' );
+    var context = canvas.getContext( 'webgl2', { alpha: true } );
+    var renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context, antialias:true } );
+    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+    //renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    //renderer.toneMappingExposure = 0.8;    
+    renderer.outputEncoding = THREE.sRGBEncoding;   
+    
+    container.appendChild(renderer.domElement);
+
+    canvases.push(canvas);
+    renderers.push(renderer);
+}
+
 function initRenderer(){
-    inputCanvas = document.createElement( 'canvas' );
-    var context = inputCanvas.getContext( 'webgl2', { alpha: true } );
-    inputSceneRenderer = new THREE.WebGLRenderer( { canvas: inputCanvas, context: context, antialias:true } );
-    inputSceneRenderer.setPixelRatio( window.devicePixelRatio );
-    inputSceneRenderer.setSize( window.innerWidth, window.innerHeight );
-
-    //renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    //renderer.toneMappingExposure = 0.8;    
-    inputSceneRenderer.outputEncoding = THREE.sRGBEncoding;
-    
-    inputContainer.appendChild(inputSceneRenderer.domElement);
-
-    canvas2 = document.createElement( 'canvas' );
-    var context = canvas2.getContext( 'webgl2', { alpha: true } );
-    scene2Renderer = new THREE.WebGLRenderer( { canvas: canvas2, context: context, antialias:true } );
-    scene2Renderer.setPixelRatio( window.devicePixelRatio );
-    scene2Renderer.setSize( window.innerWidth, window.innerHeight );
-
-    //renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    //renderer.toneMappingExposure = 0.8;    
-    scene2Renderer.outputEncoding = THREE.sRGBEncoding;
-    
-    container2.appendChild(scene2Renderer.domElement);
-
-    canvas3 = document.createElement( 'canvas' );
-    var context = canvas3.getContext( 'webgl2', { alpha: true } );
-    scene3Renderer = new THREE.WebGLRenderer( { canvas: canvas3, context: context, antialias:true } );
-    scene3Renderer.setPixelRatio( window.devicePixelRatio );
-    scene3Renderer.setSize( window.innerWidth, window.innerHeight );
-
-    //renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    //renderer.toneMappingExposure = 0.8;    
-    scene3Renderer.outputEncoding = THREE.sRGBEncoding;
-    
-    container3.appendChild(scene3Renderer.domElement);
+    addRenderer(inputContainer);
+    addRenderer(container2);
+    addRenderer(container3);
 }
 
 /*
 function onWindowResize(){
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-    inputSceneRenderer.setSize( window.innerWidth, window.innerHeight );
+    scenes[0].setSize( window.innerWidth, window.innerHeight );
 }
 */
 
 function animate() {
-    var delta = clock.getDelta();
     requestAnimationFrame( animate );
-    inputSceneRenderer.render(inputScene, camera);
-    scene2Renderer.render(scene2, camera);
-    scene3Renderer.render(scene3, camera);
+
+    for(var i=0; i<renderers.length; i++){
+        renderers[i].render(scenes[i], camera);
+    }
 }
 
 function initPolygon(){
     polygon = new Polygon();
-    inputScene.add( polygon.polygon );
+    scenes[0].add( polygon.polygon );
 }
 
 function initLine(){
     line = new Line();
-    inputScene.add(line.line);
+    scenes[0].add(line.line);
 }
 
 function updateLine(){
