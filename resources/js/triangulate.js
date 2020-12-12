@@ -23,6 +23,29 @@ const matLite = new THREE.MeshBasicMaterial( {
     side: THREE.DoubleSide
 } );
 
+function onMouseClick_triangulate(){
+    if(isButtonHovered || isButtonClicked || input.distanceTo(polygon.getLastPoint()) < distanceThreshold)
+        return;
+
+    polygon.addPoint(input);
+
+    isLineActive = true;
+
+    if(polygon.getPointCount()>=3)
+        ready.style.visibility = 'visible';
+
+    var textPos = new THREE.Vector3(input.x, input.y + 10, input.z);
+    drawText(letters[polygon.getPointCount()-1], textPos, scenes[0], './resources/fonts/Roboto_Regular.json', matLite);
+}
+
+function onMouseMove_triangulate(){
+    if(!isLineActive || isButtonHovered || isButtonClicked)
+        return;
+    
+    updateLine();
+}
+
+
 init();
 
 function init(){

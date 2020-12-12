@@ -23,8 +23,6 @@ class Polygon {
                 convexHullIndex = i*3;
             }
         }
-        console.log(convexHullIndex);
-        console.log(convexHullIndex/3);
         return convexHullIndex;
     }
 
