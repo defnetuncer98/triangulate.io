@@ -5,6 +5,7 @@ var scenes = [];
 var renderers = [];
 var containers = [];
 
+var isButtonHovered = false;
 
 var mouse = new THREE.Vector2();
 var input = new THREE.Vector2();
@@ -30,6 +31,8 @@ const step3 = document.getElementById("step3");
 
 const header1 = document.getElementById("header1");
 const header2 = document.getElementById("header2");
+
+const navbuttons = document.getElementsByClassName("nav-button");
 
 init();
 animate();

@@ -1,7 +1,6 @@
 var polygon;
 var line;
 var isLineActive = false;
-var isButtonHovered = false;
 var isButtonClicked = false;
 var distanceThreshold = 2;
 var diagonals = [];

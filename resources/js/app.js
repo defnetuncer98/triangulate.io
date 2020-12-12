@@ -9,11 +9,11 @@ function init(){
     initActions();
     initListeners();
     initPages();
-    pages();
+    pages[0]();
 }
 
 function initPages(){
-    pages.push(initTriangulate());
+    pages.push(initTriangulate);
 }
 
 function initActions(){
@@ -52,4 +52,22 @@ function initListeners(){
     //window.addEventListener( 'resize', onWindowResize, false );
     window.addEventListener( 'click', onDocumentMouseClick, false );
     window.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+    for (var i = 0; i < navbuttons.length; i++){
+        navbuttons[i].addEventListener('click', function(){changePage(i)}, false);
+        navbuttons[i].addEventListener('mouseenter', mouseEnteredNavButton, false);
+        navbuttons[i].addEventListener('mouseleave', mouseLeftNavButton, false);
+    }
+}
+
+function changePage(pageNumber){
+    pages[pageNumber]();
+}
+
+function mouseEnteredNavButton(){
+    isButtonHovered = true;
+}
+
+function mouseLeftNavButton(){
+    isButtonHovered = false;
 }

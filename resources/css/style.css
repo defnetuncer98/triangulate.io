@@ -142,3 +142,33 @@ canvas {
     width: 60px;
     visibility: hidden;
 }
+
+#menu {
+    position: fixed;
+    right:0;
+    bottom:0;
+    z-index: 2;
+    text-align: right;
+}
+
+ul#menu {
+    list-style-type: none;
+}
+
+.icon {
+    margin: 30px 30px;
+    color: #fff;
+    display: block;
+}
+
+.nav-button {
+    background-color: transparent;
+    border: 0px;
+    color: transparent;
+    font-size: 1.5rem;
+    font-family: 'Roboto', sans-serif;
+}
+
+.nav-button:hover:enabled {
+    color: rgba(255, 255, 255, 1);
+}
