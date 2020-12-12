@@ -12,6 +12,24 @@ function xor(bool1, bool2){
     return bool1 != bool2;
 }
 
+function findDeterminant(trio){
+    const det = (trio.b.x*trio.c.y + trio.a.x*trio.b.y + trio.a.y*trio.c.x) - (trio.a.y*trio.b.x + trio.b.y*trio.c.x + trio.a.x*trio.c.y);
+    return det>0;
+}
+
+function drawLine(d, scene){
+    var line = createLineGeometry(2, lineBasicMaterial_03);
+    line.geometry.setDrawRange( 0, 2 );
+    const linePoints = line.geometry.attributes.position.array;
+    linePoints[0] = d.start.x;
+    linePoints[1] = d.start.y;
+    linePoints[2] = d.start.z;
+    linePoints[3] = d.end.x
+    linePoints[4] = d.end.y;
+    linePoints[5] = d.end.z;
+    scene.add(line);
+}
+
 function createLineGeometry(point_count, mat = lineBasicMaterial_02){
     const geometry = new THREE.BufferGeometry();
 

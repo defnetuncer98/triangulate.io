@@ -14,7 +14,6 @@ var mouse = new THREE.Vector2();
 var raycaster = new THREE.Raycaster();
 
 var polygon;
-var polygonPoints;
 var line;
 var linePoints;
 var isLineActive = false;
@@ -168,7 +167,7 @@ function twoColorGraph(){
             if(coloredIndices[i]!=0)
                 continue;
             
-            drawDiagonal(diagonals[i], scene3);
+            drawLine(diagonals[i], scene3);
             coloredIndices[i] = 1;
             coloredNodeCount++;
 
@@ -222,7 +221,7 @@ function findDiagonals(){
 
             var diagonal = new THREE.Line3(startPoint, endPoint);
             
-            drawDiagonal(diagonal, inputScene);
+            drawLine(diagonal, inputScene);
 
             var intersectionFound = false;
             for(k=0; k<polygon.getPointCount(); k++){
@@ -239,11 +238,11 @@ function findDiagonals(){
 
             if(isConvex && isLeft(diagonal, trio.a) && isRight(diagonal, trio.c)){
                 diagonals.push(diagonal);
-                drawDiagonal(diagonal, scene2);
+                drawLine(diagonal, scene2);
             }
             else if(!isConvex && !(isLeft(diagonal, trio.c) && isRight(diagonal, trio.a))){
                 diagonals.push(diagonal);
-                drawDiagonal(diagonal, scene2);
+                drawLine(diagonal, scene2);
             }
         }
     }
@@ -278,7 +277,7 @@ function findAngle(index, orientation){
 
     var angle = THREE.MathUtils.radToDeg(dir1.angleTo(dir2));
 
-    if(orientation != findDeterminant(index))
+    if(orientation != findDeterminant(polygon.getTrio(convexHullIndex)))
         angle = 360-angle;
 
     var textPos = new THREE.Vector3(trio.b.x, trio.b.y - 20, trio.b.z);
@@ -288,7 +287,7 @@ function findAngle(index, orientation){
 }
 
 function findOrientation(){
-    const orientation = findDeterminant(convexHullIndex);
+    const orientation = findDeterminant(polygon.getTrio(convexHullIndex));
     if(orientation)
         triangulationInfo.innerHTML += "Orientation: Counter Clockwise <br/>";
     else
@@ -297,12 +296,6 @@ function findOrientation(){
     triangulationInfo.innerHTML += "Calculation Time Complexity: O(n) <br/>";
 
     return orientation;
-}
-
-function findDeterminant(index){
-    var trio = polygon.getTrio(index, true);
-    const det = (trio.b.x*trio.c.y + trio.a.x*trio.b.y + trio.a.y*trio.c.x) - (trio.a.y*trio.b.x + trio.b.y*trio.c.x + trio.a.x*trio.c.y);
-    return det>0;
 }
 
 function onDocumentMouseClick( event ) {
@@ -451,19 +444,6 @@ function initLine(){
     line.geometry.setDrawRange( 0, 2 );
     linePoints = line.geometry.attributes.position.array;
     inputScene.add(line);
-}
-
-function drawDiagonal(d, scene){
-    var diagonal = createLineGeometry(2, lineBasicMaterial_03);
-    diagonal.geometry.setDrawRange( 0, 2 );
-    const diagonalPoints = diagonal.geometry.attributes.position.array;
-    diagonalPoints[0] = d.start.x;
-    diagonalPoints[1] = d.start.y;
-    diagonalPoints[2] = d.start.z;
-    diagonalPoints[3] = d.end.x
-    diagonalPoints[4] = d.end.y;
-    diagonalPoints[5] = d.end.z;
-    scene.add(diagonal);
 }
 
 function connectPolygon(){
