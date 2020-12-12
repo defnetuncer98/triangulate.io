@@ -125,9 +125,9 @@ function onClickedButton(){
 
     document.body.style.overflowY = 'scroll';
 
-    scene2.add(polygon.clone());
+    scene2.add(polygon.polygon.clone());
     scene2.add(line.clone());
-    scene3.add(polygon.clone());
+    scene3.add(polygon.polygon.clone());
     scene3.add(line.clone());
 
     triangulate();
@@ -210,13 +210,13 @@ function findDiagonals(){
 
     for(i=0; i<getPointCount(); i++){
         startIndex = i*3;
-        var startPoint = getPoint(startIndex);
+        var startPoint = polygon.getPoint(startIndex);
         isConvex = findAngle(startIndex, orientation);
         var trio = new Trio(startIndex, orientation);
 
         for(j=i+2; j<getPointCount(); j++){
             endIndex = j*3;
-            var endPoint = getPoint(endIndex);
+            var endPoint = polygon.getPoint(endIndex);
 
             if(isSamePoint(trio.a, endPoint) || isSamePoint(trio.c, endPoint))
                 continue;
@@ -260,28 +260,14 @@ function findDiagonals(){
     `;
 }
 
-function xor(bool1, bool2){
-    return bool1 != bool2;
-}
-
-function isIntersecting(line1, line2){
-    if(isSamePoint(line1.start,line2.start) || isSamePoint(line1.start,line2.end) || isSamePoint(line1.end,line2.start) || isSamePoint(line1.end,line2.end))
-        return false;
-    return xor(isLeft(line1, line2.start), isLeft(line1, line2.end)) && xor(isLeft(line2, line1.start), isLeft(line2, line1.end));
-}
-
-function isSamePoint(point1, point2){
-    return point1.x==point2.x && point1.y==point2.y;
-}
-
 function Trio(index, orientation){
-    this.a = getPoint(getPreviousIndex(index));
-    this.b = getPoint(index);
-    this.c = getPoint(getNextIndex(index));
+    this.a = polygon.getPoint(getPreviousIndex(index));
+    this.b = polygon.getPoint(index);
+    this.c = polygon.getPoint(getNextIndex(index));
 
     if(!orientation){
-        this.c = getPoint(getPreviousIndex(index));
-        this.a = getPoint(getNextIndex(index));
+        this.c = polygon.getPoint(getPreviousIndex(index));
+        this.a = polygon.getPoint(getNextIndex(index));
     }
 }
 
@@ -345,17 +331,13 @@ function getNextIndex(index){
         return index+3;
 }
 
-function getPoint(index){
-    return new THREE.Vector3(polygonPoints[index], polygonPoints[index+1], polygonPoints[index+2]);
-}
-
 function onDocumentMouseClick( event ) {
-    if(isButtonHovered || isButtonClicked || input.distanceTo(getLastPoint()) < distanceThreshold)
+    if(isButtonHovered || isButtonClicked || input.distanceTo(polygon.getLastPoint()) < distanceThreshold)
         return;
 
     getInputOnScreen(event);
 
-    addPoint();
+    polygon.addPoint(input);
 
     if(!isLineActive){
         updateConvexHull();
@@ -490,10 +472,8 @@ function animate() {
 }
 
 function initPolygon(){
-    polygon = createLineGeometry(500);
-    polygon.geometry.setDrawRange( 0, 0 );
-    polygonPoints = polygon.geometry.attributes.position.array;
-    inputScene.add( polygon );
+    polygon = new Polygon();
+    inputScene.add( polygon.polygon );
 }
 
 function initLine(){
@@ -516,47 +496,16 @@ function drawDiagonal(d, scene){
     scene.add(diagonal);
 }
 
-function createLineGeometry(point_count, mat = lineBasicMaterial_02){
-    const geometry = new THREE.BufferGeometry();
-
-    const positions = new Float32Array( point_count * 3 );
-    geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-
-    const line = new THREE.Line( geometry,  mat );
-
-    const points = line.geometry.attributes.position.array;
-
-    let x, y, z, index;
-    x = y = z = index = 0;
-
-    for ( let i = 0, l = point_count; i < l; i ++ ) {
-        points[ index ++ ] = x;
-        points[ index ++ ] = y;
-        points[ index ++ ] = z;
-    }
-
-    return line;
-}
-
-function addPoint(){    
-    polygonPoints[curPolygonIndex ++ ] = input.x;
-    polygonPoints[curPolygonIndex ++ ] = input.y;
-    polygonPoints[curPolygonIndex ++ ] = 0;
-
-    polygon.geometry.setDrawRange( 0, getPointCount() );
-    polygon.geometry.attributes.position.needsUpdate = true;
-}
-
 function connectPolygon(){
     line.material = lineBasicMaterial_02;
 
-    const lastPoint = getLastPoint();
+    const lastPoint = polygon.getLastPoint();
 
     linePoints[0] = lastPoint.x;
     linePoints[1] = lastPoint.y;
     linePoints[2] = lastPoint.z;
     
-    const firstPoint = getFirstPoint();
+    const firstPoint = polygon.getFirstPoint();
 
     linePoints[3] = firstPoint.x;
     linePoints[4] = firstPoint.y;
@@ -565,24 +514,10 @@ function connectPolygon(){
     line.geometry.attributes.position.needsUpdate = true;
 }
 
-function getLastPoint(){
-    return new THREE.Vector3(
-        polygonPoints[curPolygonIndex - 3],
-        polygonPoints[curPolygonIndex - 2],
-        polygonPoints[curPolygonIndex - 1])
-}
-
-function getFirstPoint(){
-    return new THREE.Vector3(
-        polygonPoints[0],
-        polygonPoints[1],
-        polygonPoints[2])
-}
-
 function updateLine(){
     line.material = lineBasicMaterial_01;
 
-    const lastPoint = getLastPoint();
+    const lastPoint = polygon.getLastPoint();
 
     linePoints[0] = lastPoint.x;
     linePoints[1] = lastPoint.y;
