@@ -13,7 +13,6 @@ var input = new THREE.Vector2();
 var mouse = new THREE.Vector2();
 var raycaster = new THREE.Raycaster();
 
-var curPolygonIndex = 0;
 var polygon;
 var polygonPoints;
 var line;
@@ -208,13 +207,13 @@ function findDiagonals(){
 
     var orientation = findOrientation();
 
-    for(i=0; i<getPointCount(); i++){
+    for(i=0; i<polygon.getPointCount(); i++){
         startIndex = i*3;
         var startPoint = polygon.getPoint(startIndex);
         isConvex = findAngle(startIndex, orientation);
-        var trio = new Trio(startIndex, orientation);
+        var trio = polygon.getTrio(startIndex, orientation);
 
-        for(j=i+2; j<getPointCount(); j++){
+        for(j=i+2; j<polygon.getPointCount(); j++){
             endIndex = j*3;
             var endPoint = polygon.getPoint(endIndex);
 
@@ -226,8 +225,8 @@ function findDiagonals(){
             drawDiagonal(diagonal, inputScene);
 
             var intersectionFound = false;
-            for(k=0; k<getPointCount(); k++){
-                var trio2 = new Trio(k*3, true);
+            for(k=0; k<polygon.getPointCount(); k++){
+                var trio2 = polygon.getTrio(k*3, true);
 
                 if(isIntersecting(diagonal, new THREE.Line3(trio2.b, trio2.c))){
                     intersectionFound = true;
@@ -260,17 +259,6 @@ function findDiagonals(){
     `;
 }
 
-function Trio(index, orientation){
-    this.a = polygon.getPoint(getPreviousIndex(index));
-    this.b = polygon.getPoint(index);
-    this.c = polygon.getPoint(getNextIndex(index));
-
-    if(!orientation){
-        this.c = polygon.getPoint(getPreviousIndex(index));
-        this.a = polygon.getPoint(getNextIndex(index));
-    }
-}
-
 function isLeft(line, p){
     return (p.y-line.start.y)*(line.end.x-line.start.x) > (p.x-line.start.x)*(line.end.y-line.start.y);
 }
@@ -280,7 +268,7 @@ function isRight(line, p){
 }
 
 function findAngle(index, orientation){
-    var trio = new Trio(index, orientation);
+    var trio = polygon.getTrio(index, orientation);
 
     var dir1 = new THREE.Vector3();
     dir1.subVectors( trio.a, trio.b ).normalize();
@@ -312,23 +300,9 @@ function findOrientation(){
 }
 
 function findDeterminant(index){
-    var trio = new Trio(index, true);
+    var trio = polygon.getTrio(index, true);
     const det = (trio.b.x*trio.c.y + trio.a.x*trio.b.y + trio.a.y*trio.c.x) - (trio.a.y*trio.b.x + trio.b.y*trio.c.x + trio.a.x*trio.c.y);
     return det>0;
-}
-
-function getPreviousIndex(index){
-    if(index==0)
-        return curPolygonIndex-3;
-    else
-        return index-3;
-}
-
-function getNextIndex(index){
-    if(index == curPolygonIndex-3)
-        return 0;
-    else
-        return index+3;
 }
 
 function onDocumentMouseClick( event ) {
@@ -349,7 +323,7 @@ function onDocumentMouseClick( event ) {
     tryFindConvexHull();
 
     var textPos = new THREE.Vector3(input.x, input.y + 10, input.z);
-    loadText(letters[getPointCount()-1], textPos, inputScene);
+    loadText(letters[polygon.getPointCount()-1], textPos, inputScene);
 }
 
 function onDocumentMouseMove( event ) {
@@ -375,7 +349,7 @@ function updateConvexHull(){
     convexHull.x = input.x;
     convexHull.y = input.y;
     convexHull.z = input.z;
-    convexHullIndex = curPolygonIndex - 3;
+    convexHullIndex = polygon.curPolygonIndex - 3;
 }
 
 function loadText(text, pos, scene){
@@ -410,11 +384,7 @@ function tryEnableButton(){
 }
 
 function canTriangulate(){
-    return getPointCount()>=3;
-}
-
-function getPointCount(){
-    return (curPolygonIndex) / 3;
+    return polygon.getPointCount()>=3;
 }
 
 function initRenderer(){

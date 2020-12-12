@@ -1,5 +1,6 @@
 class Polygon {
     constructor(){
+        this.curPolygonIndex = 0;
         this.polygon = createLineGeometry(500);
         this.polygon.geometry.setDrawRange( 0, 0 );
         this.polygonPoints = this.polygon.geometry.attributes.position.array;
@@ -14,9 +15,9 @@ class Polygon {
 
     getLastPoint(){
         return new THREE.Vector3(
-            this.polygonPoints[curPolygonIndex - 3],
-            this.polygonPoints[curPolygonIndex - 2],
-            polygon.polygonPoints[curPolygonIndex - 1])
+            this.polygonPoints[this.curPolygonIndex - 3],
+            this.polygonPoints[this.curPolygonIndex - 2],
+            this.polygonPoints[this.curPolygonIndex - 1])
     }
 
     getFirstPoint(){
@@ -26,12 +27,45 @@ class Polygon {
             this.polygonPoints[2])
     }
 
-    addPoint(point){    
-        this.polygonPoints[curPolygonIndex ++ ] = point.x;
-        this.polygonPoints[curPolygonIndex ++ ] = point.y;
-        this.polygonPoints[curPolygonIndex ++ ] = 0;
+    getPreviousIndex(index){
+        if(index==0)
+            return this.curPolygonIndex-3;
+        else
+            return index-3;
+    }
 
-        this.polygon.geometry.setDrawRange( 0, getPointCount() );
+    getNextIndex(index){
+        if(index == this.curPolygonIndex-3)
+            return 0;
+        else
+            return index+3;
+    }
+
+    getPointCount(){
+        return (this.curPolygonIndex) / 3;
+    }
+
+    getTrio(index, orientation=true){
+        return new Trio(polygon, index, orientation);
+    }
+
+    addPoint(point){    
+        this.polygonPoints[this.curPolygonIndex ++ ] = point.x;
+        this.polygonPoints[this.curPolygonIndex ++ ] = point.y;
+        this.polygonPoints[this.curPolygonIndex ++ ] = 0;
+
+        this.polygon.geometry.setDrawRange( 0, this.getPointCount() );
         this.polygon.geometry.attributes.position.needsUpdate = true;
+    }
+}
+
+function Trio(polygon, index, orientation){
+    this.a = polygon.getPoint(polygon.getPreviousIndex(index));
+    this.b = polygon.getPoint(index);
+    this.c = polygon.getPoint(polygon.getNextIndex(index));
+
+    if(!orientation){
+        this.c = polygon.getPoint(polygon.getPreviousIndex(index));
+        this.a = polygon.getPoint(polygon.getNextIndex(index));
     }
 }
