@@ -6,6 +6,31 @@ class Polygon {
         this.polygonPoints = this.polygon.geometry.attributes.position.array;
     }
 
+    getConvexHullIndex(){
+        var convexHull = this.getFirstPoint();
+        var convexHullIndex = 0;
+
+        for(var i=0; i<this.getPointCount(); i++){
+            var point = this.getPoint(i*3);
+            if(point.x > convexHull.x){
+                convexHull.x = point.x;
+                convexHull.y = point.y;
+                convexHullIndex = i;
+            }
+            else if(convexHull.x == point.x && point.y < convexHull.y){
+                convexHull.x = point.x;
+                convexHull.y = point.y;
+                convexHullIndex = i;
+            }
+        }
+
+        return convexHullIndex;
+    }
+
+    getOrientation(){
+        return findDeterminant(this.getTrio(this.getConvexHullIndex()));
+    }
+
     getPoint(index){
         return new THREE.Vector3(
             this.polygonPoints[index],

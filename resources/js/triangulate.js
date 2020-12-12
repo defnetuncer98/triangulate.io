@@ -15,7 +15,6 @@ var raycaster = new THREE.Raycaster();
 
 var polygon;
 var line;
-var linePoints;
 var isLineActive = false;
 var isButtonHovered = false;
 var isButtonClicked = false;
@@ -124,9 +123,9 @@ function onClickedButton(){
     document.body.style.overflowY = 'scroll';
 
     scene2.add(polygon.polygon.clone());
-    scene2.add(line.clone());
+    scene2.add(line.line.clone());
     scene3.add(polygon.polygon.clone());
-    scene3.add(line.clone());
+    scene3.add(line.line.clone());
 
     triangulate();
 }
@@ -209,7 +208,7 @@ function findDiagonals(){
     for(i=0; i<polygon.getPointCount(); i++){
         startIndex = i*3;
         var startPoint = polygon.getPoint(startIndex);
-        isConvex = findAngle(startIndex, orientation);
+        isConvex = findAngle(polygon.getTrio(startIndex), orientation);
         var trio = polygon.getTrio(startIndex, orientation);
 
         for(j=i+2; j<polygon.getPointCount(); j++){
@@ -258,36 +257,8 @@ function findDiagonals(){
     `;
 }
 
-function isLeft(line, p){
-    return (p.y-line.start.y)*(line.end.x-line.start.x) > (p.x-line.start.x)*(line.end.y-line.start.y);
-}
-
-function isRight(line, p){
-    return !isLeft(line,p);
-}
-
-function findAngle(index, orientation){
-    var trio = polygon.getTrio(index, orientation);
-
-    var dir1 = new THREE.Vector3();
-    dir1.subVectors( trio.a, trio.b ).normalize();
-
-    var dir2 = new THREE.Vector3();
-    dir2.subVectors( trio.c, trio.b ).normalize();
-
-    var angle = THREE.MathUtils.radToDeg(dir1.angleTo(dir2));
-
-    if(orientation != findDeterminant(polygon.getTrio(convexHullIndex)))
-        angle = 360-angle;
-
-    var textPos = new THREE.Vector3(trio.b.x, trio.b.y - 20, trio.b.z);
-    loadText(parseInt(angle)+"", textPos, scene2);
-
-    return angle<180;
-}
-
 function findOrientation(){
-    const orientation = findDeterminant(polygon.getTrio(convexHullIndex));
+    const orientation = polygon.getOrientation();
     if(orientation)
         triangulationInfo.innerHTML += "Orientation: Counter Clockwise <br/>";
     else
@@ -306,14 +277,9 @@ function onDocumentMouseClick( event ) {
 
     polygon.addPoint(input);
 
-    if(!isLineActive){
-        updateConvexHull();
-        isLineActive = true;
-    }
+    isLineActive = true;
 
     tryEnableButton();
-
-    tryFindConvexHull();
 
     var textPos = new THREE.Vector3(input.x, input.y + 10, input.z);
     loadText(letters[polygon.getPointCount()-1], textPos, inputScene);
@@ -338,13 +304,6 @@ function getInputOnScreen( event ){
     input.y = -mouse.y + window.innerHeight/2;
 }
 
-function updateConvexHull(){
-    convexHull.x = input.x;
-    convexHull.y = input.y;
-    convexHull.z = input.z;
-    convexHullIndex = polygon.curPolygonIndex - 3;
-}
-
 function loadText(text, pos, scene){
     var loader = new THREE.FontLoader();
     loader.load( './resources/fonts/Roboto_Regular.json', function ( font ) {
@@ -362,13 +321,6 @@ function createText(font, message, x, y, z, size=12, mat=matLite){
     text.position.copy(new THREE.Vector3(x, y, z));
     text.name=name;
     return text;
-}
-
-function tryFindConvexHull(){
-    if(input.x > convexHull.x)
-        updateConvexHull();
-    else if(convexHull.x == input.x && input.y < convexHull.y)
-        updateConvexHull();
 }
 
 function tryEnableButton(){
@@ -440,44 +392,21 @@ function initPolygon(){
 }
 
 function initLine(){
-    line = createLineGeometry(2);
-    line.geometry.setDrawRange( 0, 2 );
-    linePoints = line.geometry.attributes.position.array;
-    inputScene.add(line);
-}
-
-function connectPolygon(){
-    line.material = lineBasicMaterial_02;
-
-    const lastPoint = polygon.getLastPoint();
-
-    linePoints[0] = lastPoint.x;
-    linePoints[1] = lastPoint.y;
-    linePoints[2] = lastPoint.z;
-    
-    const firstPoint = polygon.getFirstPoint();
-
-    linePoints[3] = firstPoint.x;
-    linePoints[4] = firstPoint.y;
-    linePoints[5] = firstPoint.z;
-    
-    line.geometry.attributes.position.needsUpdate = true;
+    line = new Line();
+    inputScene.add(line.line);
 }
 
 function updateLine(){
-    line.material = lineBasicMaterial_01;
-
     const lastPoint = polygon.getLastPoint();
+    line.updateLine(lastPoint, input);
+    line.updateLineMat(lineBasicMaterial_01);
+}
 
-    linePoints[0] = lastPoint.x;
-    linePoints[1] = lastPoint.y;
-    linePoints[2] = lastPoint.z;
-    
-    linePoints[3] = input.x;
-    linePoints[4] = input.y;
-    linePoints[5] = 0;
-    
-    line.geometry.attributes.position.needsUpdate = true;
+function connectPolygon(){
+    const firstPoint = polygon.getFirstPoint();
+    const lastPoint = polygon.getLastPoint();
+    line.updateLine(lastPoint, firstPoint);
+    line.updateLineMat(lineBasicMaterial_02);
 }
 
 function updateCursor(){

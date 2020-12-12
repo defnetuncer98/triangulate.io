@@ -17,6 +17,14 @@ function findDeterminant(trio){
     return det>0;
 }
 
+function isLeft(line, p){
+    return (p.y-line.start.y)*(line.end.x-line.start.x) > (p.x-line.start.x)*(line.end.y-line.start.y);
+}
+
+function isRight(line, p){
+    return !isLeft(line,p);
+}
+
 function drawLine(d, scene){
     var line = createLineGeometry(2, lineBasicMaterial_03);
     line.geometry.setDrawRange( 0, 2 );
@@ -50,4 +58,22 @@ function createLineGeometry(point_count, mat = lineBasicMaterial_02){
     }
 
     return line;
+}
+
+function findAngle(trio, orientation){
+    var dir1 = new THREE.Vector3();
+    dir1.subVectors( trio.a, trio.b ).normalize();
+
+    var dir2 = new THREE.Vector3();
+    dir2.subVectors( trio.c, trio.b ).normalize();
+
+    var angle = THREE.MathUtils.radToDeg(dir1.angleTo(dir2));
+
+    if(orientation != findDeterminant(trio))
+        angle = 360-angle;
+
+    var textPos = new THREE.Vector3(trio.b.x, trio.b.y - 20, trio.b.z);
+    loadText(parseInt(angle)+"", textPos, scene2);
+
+    return angle<180;
 }
