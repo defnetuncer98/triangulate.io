@@ -34,6 +34,11 @@ const header2 = document.getElementById("header2");
 
 const navbuttons = document.getElementsByClassName("nav-button");
 
+const page1button = document.getElementById("page1");
+const page2button = document.getElementById("page2");
+const page3button = document.getElementById("page3");
+const page4button = document.getElementById("page4");
+
 init();
 animate();
 

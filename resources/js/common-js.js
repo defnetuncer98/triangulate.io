@@ -1,22 +1,17 @@
-var isVisible = false;
+function showSteps(){
+    step1.style.visibility = 'visible';
+    step2.style.visibility = 'visible';
+    step3.style.visibility = 'visible';
+    swipeup.style.visibility = 'visible';
+    document.body.style.overflowY = 'scroll';
+}
 
-function toggleSteps(){
-    isVisible = !isVisible;
-
-    var visibility = 'visible';
-    
-    if(!isVisible) visibility = 'hidden';
-
-    step1.style.visibility = visibility;
-    step2.style.visibility = visibility;
-    step3.style.visibility = visibility;
-    swipeup.style.visibility = visibility;
-
-    if(isVisible)
-        document.body.style.overflowY = 'scroll';
-    else
-        document.body.style.overflowY = 'hidden';
-
+function hideSteps(){
+    step1.style.visibility = 'hidden';
+    step2.style.visibility = 'hidden';
+    step3.style.visibility = 'hidden';
+    swipeup.style.visibility = 'hidden';
+    document.body.style.overflowY = 'hidden';
 }
 
 function resetInfos(){
@@ -41,4 +36,16 @@ function clearScene(scene){
     while(scene.children.length > 0){ 
         scene.remove(scene.children[0]); 
     }
+}
+
+function resetAll(){
+    resetScenes();
+    resetInfos();
+    hideButtons();
+    hideSteps();
+}
+
+function hideButtons(){
+    ready.style.visibility = 'hidden';
+    reset.style.visibility = 'hidden';
 }

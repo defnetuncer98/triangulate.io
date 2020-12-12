@@ -44,17 +44,16 @@ function onMouseMove_triangulate(){
     updateLine();
 }
 
-function initTriangulate(){
-    resetScenes();
-    resetInfos();
-    resetGlobals();
+function init_triangulate(){
+    resetAll();
+    resetGlobals_triangulate();
 
-    initInfo();
-    initPolygon();
-    initLine();
+    initInfo_triangulate();
+    initPolygon_triangulate();
+    initLine_triangulate();
 }
 
-function initInfo(){
+function initInfo_triangulate(){
     header1.innerHTML = "triangulateMe";
     header2.innerHTML = "Polygon Triangulation by Graph Coloring";
     step1.innerHTML = "STEP 1 | Find Orientation";
@@ -62,12 +61,12 @@ function initInfo(){
     step3.innerHTML = "STEP 3 | Two Coloring Graph";
 }
 
-function initPolygon(){
+function initPolygon_triangulate(){
     polygon = new Polygon();
     scenes[0].add( polygon.polygon );
 }
 
-function initLine(){
+function initLine_triangulate(){
     line = new Line();
     scenes[0].add(line.line);
 }
@@ -104,9 +103,9 @@ function onLeftReadyButton(){
 }
 
 function onClickedResetButton(){
-    toggleSteps();
+    hideSteps();
 
-    initTriangulate();
+    init_triangulate();
 
     reset.style.visibility = 'hidden';
 }
@@ -119,7 +118,7 @@ function onLeftResetButton(){
     isButtonHovered = false;
 }
 
-function resetGlobals(){
+function resetGlobals_triangulate(){
     isLineActive = false;
     isButtonClicked = false;
     diagonals = [];
@@ -136,7 +135,7 @@ function onClickedReadyButton(){
     scenes[2].add(polygon.polygon.clone());
     scenes[2].add(line.line.clone());
 
-    toggleSteps();
+    showSteps();
 
     triangulate();
 }

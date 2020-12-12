@@ -13,10 +13,13 @@ function init(){
 }
 
 function initPages(){
-    pages.push(initTriangulate);
+    pages.push(init_home);
+    pages.push(init_triangulate);
 }
 
 function initActions(){
+    onDocumentMouseClickActions.push(onMouseClick_home);
+    onDocumentMouseMoveActions.push(onMouseMove_home);
     onDocumentMouseClickActions.push(onMouseClick_triangulate);
     onDocumentMouseMoveActions.push(onMouseMove_triangulate);
 }
@@ -54,14 +57,19 @@ function initListeners(){
     window.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
     for (var i = 0; i < navbuttons.length; i++){
-        navbuttons[i].addEventListener('click', function(){changePage(i)}, false);
         navbuttons[i].addEventListener('mouseenter', mouseEnteredNavButton, false);
         navbuttons[i].addEventListener('mouseleave', mouseLeftNavButton, false);
     }
+
+    page1button.addEventListener('click', function(){changePage(0)}, false);
+    page2button.addEventListener('click', function(){changePage(1)}, false);
+    page3button.addEventListener('click', function(){changePage(2)}, false);
+    page4button.addEventListener('click', function(){changePage(3)}, false);
 }
 
-function changePage(pageNumber){
-    pages[pageNumber]();
+function changePage(pageIndex){
+    pages[pageIndex]();
+    currentPageIndex = pageIndex;
 }
 
 function mouseEnteredNavButton(){

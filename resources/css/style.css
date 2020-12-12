@@ -171,4 +171,9 @@ ul#menu {
 
 .nav-button:hover:enabled {
     color: rgba(255, 255, 255, 1);
+    cursor: pointer;
+}
+
+.gridcontainer{
+    z-index: 2;
 }
