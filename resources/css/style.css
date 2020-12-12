@@ -98,7 +98,7 @@ canvas {
     visibility: hidden;
 }
 
-#ready{
+.def-button{
     grid-column-start: 2;
     grid-column-end: span 1;
     grid-row-start: 6;
@@ -112,7 +112,7 @@ canvas {
     visibility: hidden;
 }
 
-#ready:hover:enabled {
+.def-button:hover:enabled {
     border-color: cornflowerblue;
     color: rgba(255, 255, 255, 1);
 }

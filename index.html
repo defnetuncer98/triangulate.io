@@ -11,13 +11,14 @@
 		<div class="gridcontainer">
 			<div class="griditem1 section">triangulateMe</div>
 			<div class="griditem2 subtitle">Polygon Triangulation by Graph Coloring</div>
-			<div id="step1" class="griditem3 section">STEP 1 | Find Orientation</div>
+			<div id="step1" class="griditem3 section"></div>
 			<div id="info1" class="subtitle"></div>
-			<div id="step2" class="griditem4 section">STEP 2 | Internal Diagonals</div>
+			<div id="step2" class="griditem4 section"></div>
 			<div id="info2" class="subtitle"></div>
-			<div id="step3" class="griditem5 section">STEP 3 | Two Coloring Graph</div>
+			<div id="step3" class="griditem5 section"></div>
 			<div id="info3" class="subtitle"></div>
-			<button id="ready" type="button" onclick="onClickedReadyButton()" onmouseenter="onEnteredReadyButton()" onmouseleave="onLeftReadyButton()">Ready?</button>
+			<button id="ready" class="def-button" type="button" onclick="onClickedReadyButton()" onmouseenter="onEnteredReadyButton()" onmouseleave="onLeftReadyButton()">Ready?</button>
+			<button id="reset" class="def-button" type="button" onclick="onClickedResetButton()" onmouseenter="onEnteredResetButton()" onmouseleave="onLeftResetButton()">Reset</button>
 		</div>
 		<div id="input-canvas"></div>
 		<div id="canvas-2"></div>
@@ -28,6 +29,7 @@
 		<image id="swipeup" src="resources/images/swipeup.gif"></image>
 		<script src="resources/js/three.js"></script>
 		<script src="resources/js/init.js"></script>
+		<script src="resources/js/common-js.js"></script>
 		<script src="resources/js/common-three.js"></script>
 		<script src="resources/js/common-cg.js"></script>
 		<script src="resources/js/line.js"></script>

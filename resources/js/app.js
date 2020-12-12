@@ -1,3 +1,6 @@
+var currentPageIndex = 0;
+var onDocumentMouseClickActions = [];
+var onDocumentMouseMoveActions = [];
 
 init();
 

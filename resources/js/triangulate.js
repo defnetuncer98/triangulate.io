@@ -45,12 +45,18 @@ function onMouseMove_triangulate(){
     updateLine();
 }
 
+initTriangulate();
 
-init();
-
-function init(){
+function initTriangulate(){
+    initInfo();
     initPolygon();
     initLine();
+}
+
+function initInfo(){
+    step1.innerHTML = "STEP 1 | Find Orientation";
+    step2.innerHTML = "STEP 2 | Internal Diagonals";
+    step3.innerHTML = "STEP 3 | Two Coloring Graph";
 }
 
 function initPolygon(){
@@ -94,21 +100,43 @@ function onLeftReadyButton(){
     updateLine();
 }
 
+function onClickedResetButton(){
+    toggleSteps();
+    resetInfos();
+    console.log(scenes[0].children.length);
+    resetScenes();
+    resetGlobals();
+    initTriangulate();
+    console.log(scenes[0].children.length);
+    reset.style.visibility = 'hidden';
+}
+
+function onEnteredResetButton(){
+    isButtonHovered = true;
+}
+
+function onLeftResetButton(){
+    isButtonHovered = false;
+}
+
+function resetGlobals(){
+    isLineActive = false;
+    isButtonClicked = false;
+    diagonals = [];
+    graph = [];
+}
+
 function onClickedReadyButton(){
     isButtonClicked = true;
     ready.style.visibility = 'hidden';
-
-    document.body.style.overflowY = 'scroll';
+    reset.style.visibility = 'visible';
 
     scenes[1].add(polygon.polygon.clone());
     scenes[1].add(line.line.clone());
     scenes[2].add(polygon.polygon.clone());
     scenes[2].add(line.line.clone());
 
-    document.getElementById("step1").style.visibility = 'visible';
-    document.getElementById("step2").style.visibility = 'visible';
-    document.getElementById("step3").style.visibility = 'visible';
-    document.getElementById("swipeup").style.visibility = 'visible';
+    toggleSteps();
 
     triangulate();
 }

@@ -16,13 +16,18 @@ containers.push(document.getElementById('canvas-2'));
 containers.push(document.getElementById('canvas-3'));
 
 const ready = document.getElementById("ready");
+const reset = document.getElementById("reset");
+
+const swipeup = document.getElementById("swipeup");
+
 const info1 = document.getElementById("info1");
 const info2 = document.getElementById("info2");
 const info3 = document.getElementById("info3");
 
-var currentPageIndex = 0;
-var onDocumentMouseClickActions = [];
-var onDocumentMouseMoveActions = [];
+const step1 = document.getElementById("step1");
+const step2 = document.getElementById("step2");
+const step3 = document.getElementById("step3");
+
 
 init();
 animate();
