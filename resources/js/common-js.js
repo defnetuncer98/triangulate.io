@@ -20,6 +20,9 @@ function toggleSteps(){
 }
 
 function resetInfos(){
+    header1.innerHTML = '';
+    header2.innerHTML = '';
+
     info1.innerHTML = '';
     info2.innerHTML = '';
     info3.innerHTML = '';

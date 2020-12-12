@@ -45,15 +45,19 @@ function onMouseMove_triangulate(){
     updateLine();
 }
 
-initTriangulate();
-
 function initTriangulate(){
+    resetScenes();
+    resetInfos();
+    resetGlobals();
+
     initInfo();
     initPolygon();
     initLine();
 }
 
 function initInfo(){
+    header1.innerHTML = "triangulateMe";
+    header2.innerHTML = "Polygon Triangulation by Graph Coloring";
     step1.innerHTML = "STEP 1 | Find Orientation";
     step2.innerHTML = "STEP 2 | Internal Diagonals";
     step3.innerHTML = "STEP 3 | Two Coloring Graph";
@@ -102,12 +106,9 @@ function onLeftReadyButton(){
 
 function onClickedResetButton(){
     toggleSteps();
-    resetInfos();
-    console.log(scenes[0].children.length);
-    resetScenes();
-    resetGlobals();
+
     initTriangulate();
-    console.log(scenes[0].children.length);
+
     reset.style.visibility = 'hidden';
 }
 

@@ -1,19 +1,25 @@
 var currentPageIndex = 0;
 var onDocumentMouseClickActions = [];
 var onDocumentMouseMoveActions = [];
+var pages = [];
 
 init();
 
 function init(){
     initActions();
     initListeners();
+    initPages();
+    pages();
+}
+
+function initPages(){
+    pages.push(initTriangulate());
 }
 
 function initActions(){
     onDocumentMouseClickActions.push(onMouseClick_triangulate);
     onDocumentMouseMoveActions.push(onMouseMove_triangulate);
 }
-
 
 function onDocumentMouseClick( event ) {
     getInputOnScreen(event);
