@@ -9,6 +9,11 @@ containers.push(document.getElementById('input-canvas'));
 containers.push(document.getElementById('canvas-2'));
 containers.push(document.getElementById('canvas-3'));
 
+const ready = document.getElementById("ready");
+const info1 = document.getElementById("info1");
+const info2 = document.getElementById("info2");
+const info3 = document.getElementById("info3");
+
 init();
 animate();
 
@@ -113,7 +118,7 @@ function onDocumentMouseClick( event ) {
     isLineActive = true;
 
     if(polygon.getPointCount()>=3)
-        triangulateMe.style.visibility = 'visible';
+        ready.style.visibility = 'visible';
 
     var textPos = new THREE.Vector3(input.x, input.y + 10, input.z);
     drawText(letters[polygon.getPointCount()-1], textPos, scenes[0], './resources/fonts/Roboto_Regular.json', matLite);

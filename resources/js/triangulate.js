@@ -13,11 +13,6 @@ const colorPalette_03 = 0x7FFF00;
 
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-const triangulateMe = document.getElementById("triangulateMe");
-const triangulationInfo = document.getElementById("triangulationInfo");
-const triangulationInfo2 = document.getElementById("triangulationInfo2");
-const triangulationInfo3 = document.getElementById("triangulationInfo3");
-
 const lineBasicMaterial_01 = new THREE.LineBasicMaterial( { color: colorPalette_01, transparent: true, opacity : 0.3 } );
 const lineBasicMaterial_02 = new THREE.LineBasicMaterial( { color: colorPalette_02 } );
 const lineBasicMaterial_03 = new THREE.LineBasicMaterial( { color: colorPalette_03 } );
@@ -78,7 +73,7 @@ function onLeftReadyButton(){
 
 function onClickedReadyButton(){
     isButtonClicked = true;
-    triangulateMe.style.visibility = 'hidden';
+    ready.style.visibility = 'hidden';
 
     document.body.style.overflowY = 'scroll';
 
@@ -147,7 +142,7 @@ function findDiagonals(){
         }
     }
 
-    triangulationInfo2.innerHTML += `
+    info2.innerHTML += `
     Approach: A potential diagonal of the polygon have two features: having both ends internal and not intersecting with an edge. For all diagonals below steps are performed.
     <br/> <br/> <b>Convex or Reflex?</b>
     The angle is marked as reflex if it's sign is negative and convex otherwise. 
@@ -160,22 +155,22 @@ function findDiagonals(){
 
 function findConvexHull(){
     
-    triangulationInfo.innerHTML += `Approach: When traveling on a <b>counter-clockwise oriented simple polygon</b>one always has the curve interior to the left.
+    info1.innerHTML += `Approach: When traveling on a <b>counter-clockwise oriented simple polygon</b>one always has the curve interior to the left.
     <br/> <br/> Therefore the orientation of a simple polygon is related to the <b>sign of the angle</b> at any vertex of the convex hull of the polygon.
     <br/> <br/> Using this fact rigthmost vertex is found and orientation is calculated.
     <br/> <br/> `;
 
-    triangulationInfo.innerHTML += "Rightmost Vertex: " + letters[polygon.getConvexHullIndex() / 3] + "<br/>";
+    info1.innerHTML += "Rightmost Vertex: " + letters[polygon.getConvexHullIndex() / 3] + "<br/>";
 }
 
 function findOrientation(){
     const orientation = polygon.getOrientation();
     if(orientation)
-        triangulationInfo.innerHTML += "Orientation: Counter Clockwise <br/>";
+        info1.innerHTML += "Orientation: Counter Clockwise <br/>";
     else
-        triangulationInfo.innerHTML += "Orientation: Clockwise <br/>";
+        info1.innerHTML += "Orientation: Clockwise <br/>";
 
-    triangulationInfo.innerHTML += "Calculation Time Complexity: O(n) <br/>";
+    info1.innerHTML += "Calculation Time Complexity: O(n) <br/>";
 
     return orientation;
 }
@@ -215,7 +210,7 @@ function twoColorGraph(scene){
         }
     }
 
-    triangulationInfo3.innerHTML += `After finding all diagonals that are internal and not crossing any edge,
+    info3.innerHTML += `After finding all diagonals that are internal and not crossing any edge,
     the graph is constructed which for each <b>diagonal</b> of the polygon, there is a corresponding <b>node</b> in the graph
     and for <b>every pair of intersecting diagonals</b>, there is an <b>edge</b> between the corresponding graph nodes.
     An adjacency matrix is used to represent the graph where a key keeps an index of a diagonal and it's
