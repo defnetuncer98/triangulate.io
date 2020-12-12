@@ -1,14 +1,3 @@
-var camera;
-
-var canvases = [];
-var scenes = [];
-var renderers = [];
-var containers = [];
-
-containers.push(document.getElementById('input-canvas'));
-containers.push(document.getElementById('canvas-2'));
-containers.push(document.getElementById('canvas-3'));
-
 var polygon;
 var line;
 var isLineActive = false;
@@ -40,101 +29,36 @@ const matLite = new THREE.MeshBasicMaterial( {
 } );
 
 init();
-animate();
 
 function init(){
-    initCanvas(3);
-    initCamera();
-    initListeners();
     initPolygon();
     initLine();
 }
 
-function animate() {
-    requestAnimationFrame( animate );
-
-    for(var i=0; i<renderers.length; i++){
-        renderers[i].render(scenes[i], camera);
-    }
+function initPolygon(){
+    polygon = new Polygon();
+    scenes[0].add( polygon.polygon );
 }
 
-function initCanvas(canvasCount = 1){
-    for(var i=0; i<canvasCount; i++){
-        canvases.push(createCanvas(containers[i]));
-    }
+function initLine(){
+    line = new Line();
+    scenes[0].add(line.line);
 }
 
-function createCanvas(container){
-    var canvas = document.createElement( 'canvas' );
-
-    var renderer = createRenderer(canvas);
-    renderers.push(renderer);
-    container.appendChild(renderer.domElement);
-
-    var scene = new THREE.Scene();
-    scenes.push(scene);
-
-    return canvas;
+function updateLine(){
+    const lastPoint = polygon.getLastPoint();
+    line.updateLine(lastPoint, input);
+    line.updateLineMat(lineBasicMaterial_01);
 }
 
-function createRenderer(canvas){
-    var context = canvas.getContext( 'webgl2', { alpha: true } );
-    var renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context, antialias:true } );
-    renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
-
-    //renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    //renderer.toneMappingExposure = 0.8;    
-    renderer.outputEncoding = THREE.sRGBEncoding;   
-
-    return renderer;
+function connectPolygon(){
+    const firstPoint = polygon.getFirstPoint();
+    const lastPoint = polygon.getLastPoint();
+    line.updateLine(lastPoint, firstPoint);
+    line.updateLineMat(lineBasicMaterial_02);
 }
 
-function initCamera(){
-    var w = window.innerWidth;
-    var h = window.innerHeight;
-    var aspectRatio = w / h;
-    var viewSize = h;
-    
-    var viewport = {
-        viewSize: viewSize,
-        aspectRatio: aspectRatio,
-        left: (-aspectRatio * viewSize) / 2,
-        right: (aspectRatio * viewSize) / 2,
-        top: viewSize / 2,
-        bottom: -viewSize / 2,
-        near: 0,
-        far: 5
-    }
-    
-    camera = new THREE.OrthographicCamera ( 
-        viewport.left, 
-        viewport.right, 
-        viewport.top, 
-        viewport.bottom, 
-        viewport.near, 
-        viewport.far 
-    );
-
-    camera.position.set( 0, 0, 0);
-    camera.lookAt( 0, 0, 0 );
-}
-
-/*
-function onWindowResize(){
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    scenes[0].setSize( window.innerWidth, window.innerHeight );
-}
-*/
-
-function initListeners(){
-    //window.addEventListener( 'resize', onWindowResize, false );
-    window.addEventListener( 'click', onDocumentMouseClick, false );
-    window.addEventListener( 'mousemove', onDocumentMouseMove, false );
-}
-
-function onEnteredButton(){
+function onEnteredReadyButton(){
     isButtonHovered = true;
 
     if(!isLineActive || isButtonClicked)
@@ -143,7 +67,7 @@ function onEnteredButton(){
     connectPolygon();
 }
 
-function onLeftButton(){
+function onLeftReadyButton(){
     isButtonHovered = false;
 
     if(!isLineActive || isButtonClicked)
@@ -152,7 +76,7 @@ function onLeftButton(){
     updateLine();
 }
 
-function onClickedButton(){
+function onClickedReadyButton(){
     isButtonClicked = true;
     triangulateMe.style.visibility = 'hidden';
 
@@ -163,76 +87,18 @@ function onClickedButton(){
     scenes[2].add(polygon.polygon.clone());
     scenes[2].add(line.line.clone());
 
-    triangulate();
-}
-
-function triangulate(){
     document.getElementById("step1").style.visibility = 'visible';
     document.getElementById("step2").style.visibility = 'visible';
     document.getElementById("step3").style.visibility = 'visible';
     document.getElementById("swipeup").style.visibility = 'visible';
 
+    triangulate();
+}
+
+function triangulate(){
     findDiagonals();
 
     twoColorGraph(scenes[2]);
-}
-
-function createGraph(){
-    for(i=0; i<diagonals.length; i++) graph.push([]);
-
-    for(i=0; i<diagonals.length; i++){
-        for(j=i+1; j<diagonals.length; j++){
-            if(isIntersecting(diagonals[i], diagonals[j])){
-                graph[i].push(j);
-                graph[j].push(i);
-            }
-        }
-    }
-}
-
-function twoColorGraph(scene){
-    createGraph();
-
-    var coloredIndices = [];
-    for(i=0; i<graph.length; i++) coloredIndices.push(0);
-    var coloredNodeCount = 0;
-    while(coloredNodeCount < graph.length){
-        for(i=0; i<graph.length; i++){
-            if(coloredIndices[i]!=0)
-                continue;
-            
-            drawLine(diagonals[i], scene);
-            coloredIndices[i] = 1;
-            coloredNodeCount++;
-
-            for(j=0;j<graph[i].length; j++){
-                coloredIndices[graph[i][j]] = 1;
-                coloredNodeCount++;
-            }
-        }
-    }
-
-    triangulationInfo3.innerHTML += `After finding all diagonals that are internal and not crossing any edge,
-    the graph is constructed which for each <b>diagonal</b> of the polygon, there is a corresponding <b>node</b> in the graph
-    and for <b>every pair of intersecting diagonals</b>, there is an <b>edge</b> between the corresponding graph nodes.
-    An adjacency matrix is used to represent the graph where a key keeps an index of a diagonal and it's
-    value is the list of indices of diagonals that it intersects with.
-    <br><br>Steps to two-color graph:
-    <br> Randomly choose an uncolored node, u
-    <br> Color u as <b>white</b>
-    <br> Color all neighbors of u as <b>black</b>
-    <br> Repeat until all nodes are colored
-    <br><br> White nodes are now our triangulation!`;
-}
-
-function findConvexHull(){
-    
-    triangulationInfo.innerHTML += `Approach: When traveling on a <b>counter-clockwise oriented simple polygon</b>one always has the curve interior to the left.
-    <br/> <br/> Therefore the orientation of a simple polygon is related to the <b>sign of the angle</b> at any vertex of the convex hull of the polygon.
-    <br/> <br/> Using this fact rigthmost vertex is found and orientation is calculated.
-    <br/> <br/> `;
-
-    triangulationInfo.innerHTML += "Rightmost Vertex: " + letters[polygon.getConvexHullIndex() / 3] + "<br/>";
 }
 
 function findDiagonals(){
@@ -292,6 +158,16 @@ function findDiagonals(){
     `;
 }
 
+function findConvexHull(){
+    
+    triangulationInfo.innerHTML += `Approach: When traveling on a <b>counter-clockwise oriented simple polygon</b>one always has the curve interior to the left.
+    <br/> <br/> Therefore the orientation of a simple polygon is related to the <b>sign of the angle</b> at any vertex of the convex hull of the polygon.
+    <br/> <br/> Using this fact rigthmost vertex is found and orientation is calculated.
+    <br/> <br/> `;
+
+    triangulationInfo.innerHTML += "Rightmost Vertex: " + letters[polygon.getConvexHullIndex() / 3] + "<br/>";
+}
+
 function findOrientation(){
     const orientation = polygon.getOrientation();
     if(orientation)
@@ -304,61 +180,50 @@ function findOrientation(){
     return orientation;
 }
 
-function onDocumentMouseClick( event ) {
-    if(isButtonHovered || isButtonClicked || input.distanceTo(polygon.getLastPoint()) < distanceThreshold)
-        return;
+function createGraph(){
+    for(i=0; i<diagonals.length; i++) graph.push([]);
 
-    getInputOnScreen(event);
-
-    polygon.addPoint(input);
-
-    isLineActive = true;
-
-    tryEnableButton();
-
-    var textPos = new THREE.Vector3(input.x, input.y + 10, input.z);
-    drawText(letters[polygon.getPointCount()-1], textPos, scenes[0], './resources/fonts/Roboto_Regular.json', matLite);
+    for(i=0; i<diagonals.length; i++){
+        for(j=i+1; j<diagonals.length; j++){
+            if(isIntersecting(diagonals[i], diagonals[j])){
+                graph[i].push(j);
+                graph[j].push(i);
+            }
+        }
+    }
 }
 
-function onDocumentMouseMove( event ) {
-    getInputOnScreen(event);
+function twoColorGraph(scene){
+    createGraph();
 
-    updateCursor();
+    var coloredIndices = [];
+    for(i=0; i<graph.length; i++) coloredIndices.push(0);
+    var coloredNodeCount = 0;
+    while(coloredNodeCount < graph.length){
+        for(i=0; i<graph.length; i++){
+            if(coloredIndices[i]!=0)
+                continue;
+            
+            drawLine(diagonals[i], scene);
+            coloredIndices[i] = 1;
+            coloredNodeCount++;
 
-    if(!isLineActive || isButtonHovered || isButtonClicked)
-        return;
-    
-    updateLine();
-}
+            for(j=0;j<graph[i].length; j++){
+                coloredIndices[graph[i][j]] = 1;
+                coloredNodeCount++;
+            }
+        }
+    }
 
-function tryEnableButton(){
-    if(canTriangulate())
-        triangulateMe.style.visibility = 'visible';
-}
-
-function canTriangulate(){
-    return polygon.getPointCount()>=3;
-}
-
-function initPolygon(){
-    polygon = new Polygon();
-    scenes[0].add( polygon.polygon );
-}
-
-function initLine(){
-    line = new Line();
-    scenes[0].add(line.line);
-}
-
-function updateLine(){
-    const lastPoint = polygon.getLastPoint();
-    line.updateLine(lastPoint, input);
-    line.updateLineMat(lineBasicMaterial_01);
-}
-
-function connectPolygon(){
-    const firstPoint = polygon.getFirstPoint();
-    const lastPoint = polygon.getLastPoint();
-    line.updateLine(lastPoint, firstPoint);
-    line.updateLineMat(lineBasicMaterial_02);
+    triangulationInfo3.innerHTML += `After finding all diagonals that are internal and not crossing any edge,
+    the graph is constructed which for each <b>diagonal</b> of the polygon, there is a corresponding <b>node</b> in the graph
+    and for <b>every pair of intersecting diagonals</b>, there is an <b>edge</b> between the corresponding graph nodes.
+    An adjacency matrix is used to represent the graph where a key keeps an index of a diagonal and it's
+    value is the list of indices of diagonals that it intersects with.
+    <br><br>Steps to two-color graph:
+    <br> Randomly choose an uncolored node, u
+    <br> Color u as <b>white</b>
+    <br> Color all neighbors of u as <b>black</b>
+    <br> Repeat until all nodes are colored
+    <br><br> White nodes are now our triangulation!`;
 }
