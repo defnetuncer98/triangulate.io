@@ -9,17 +9,12 @@ var clock;
 var inputSceneRenderer;
 var scene2Renderer;
 var scene3Renderer;
-var input = new THREE.Vector2();
-var mouse = new THREE.Vector2();
-var raycaster = new THREE.Raycaster();
 
 var polygon;
 var line;
 var isLineActive = false;
 var isButtonHovered = false;
 var isButtonClicked = false;
-var convexHull = new THREE.Vector3();
-var convexHullIndex;
 var distanceThreshold = 2;
 var diagonals = [];
 var graph = [];
@@ -28,7 +23,8 @@ const colorPalette_01 = 0xffffff;
 const colorPalette_02 = 0x6495ED;
 const colorPalette_03 = 0x7FFF00;
 
-const cursor = document.getElementById('cursor-container');
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
 const inputContainer = document.getElementById('input-canvas');
 const container2 = document.getElementById('canvas-2');
 const container3 = document.getElementById('canvas-3');
@@ -36,8 +32,6 @@ const triangulateMe = document.getElementById("triangulateMe");
 const triangulationInfo = document.getElementById("triangulationInfo");
 const triangulationInfo2 = document.getElementById("triangulationInfo2");
 const triangulationInfo3 = document.getElementById("triangulationInfo3");
-
-const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 const lineBasicMaterial_01 = new THREE.LineBasicMaterial( { color: colorPalette_01, transparent: true, opacity : 0.3 } );
 const lineBasicMaterial_02 = new THREE.LineBasicMaterial( { color: colorPalette_02 } );
@@ -197,7 +191,7 @@ function findConvexHull(){
     <br/> <br/> Using this fact rigthmost vertex is found and orientation is calculated.
     <br/> <br/> `;
 
-    triangulationInfo.innerHTML += "Rightmost Vertex: " + letters[convexHullIndex / 3] + "<br/>";
+    triangulationInfo.innerHTML += "Rightmost Vertex: " + letters[polygon.getConvexHullIndex() / 3] + "<br/>";
 }
 
 function findDiagonals(){
@@ -282,7 +276,7 @@ function onDocumentMouseClick( event ) {
     tryEnableButton();
 
     var textPos = new THREE.Vector3(input.x, input.y + 10, input.z);
-    loadText(letters[polygon.getPointCount()-1], textPos, inputScene);
+    drawText(letters[polygon.getPointCount()-1], textPos, inputScene, './resources/fonts/Roboto_Regular.json', matLite);
 }
 
 function onDocumentMouseMove( event ) {
@@ -294,33 +288,6 @@ function onDocumentMouseMove( event ) {
         return;
     
     updateLine();
-}
-
-function getInputOnScreen( event ){
-    mouse.x = event.clientX;
-    mouse.y = event.clientY;
-
-    input.x = mouse.x - window.innerWidth/2;
-    input.y = -mouse.y + window.innerHeight/2;
-}
-
-function loadText(text, pos, scene){
-    var loader = new THREE.FontLoader();
-    loader.load( './resources/fonts/Roboto_Regular.json', function ( font ) {
-        scene.add( createText(font, text, pos.x, pos.y, pos.z));
-    });    
-}
-
-function createText(font, message, x, y, z, size=12, mat=matLite){
-    var shapes = font.generateShapes( message, size );
-    var geometry = new THREE.ShapeBufferGeometry( shapes );
-    geometry.computeBoundingBox();
-    var xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
-    geometry.translate( xMid, 0, 0 );
-    var text = new THREE.Mesh( geometry, mat );
-    text.position.copy(new THREE.Vector3(x, y, z));
-    text.name=name;
-    return text;
 }
 
 function tryEnableButton(){
@@ -407,9 +374,4 @@ function connectPolygon(){
     const lastPoint = polygon.getLastPoint();
     line.updateLine(lastPoint, firstPoint);
     line.updateLineMat(lineBasicMaterial_02);
-}
-
-function updateCursor(){
-    cursor.style.top = mouse.y + 'px';
-    cursor.style.left = mouse.x + 'px';
 }
