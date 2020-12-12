@@ -3,6 +3,11 @@ var camera;
 var canvases = [];
 var scenes = [];
 var renderers = [];
+var containers = [];
+
+containers.push(document.getElementById('input-canvas'));
+containers.push(document.getElementById('canvas-2'));
+containers.push(document.getElementById('canvas-3'));
 
 var polygon;
 var line;
@@ -19,9 +24,6 @@ const colorPalette_03 = 0x7FFF00;
 
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-const inputContainer = document.getElementById('input-canvas');
-const container2 = document.getElementById('canvas-2');
-const container3 = document.getElementById('canvas-3');
 const triangulateMe = document.getElementById("triangulateMe");
 const triangulationInfo = document.getElementById("triangulationInfo");
 const triangulationInfo2 = document.getElementById("triangulationInfo2");
@@ -41,13 +43,54 @@ init();
 animate();
 
 function init(){
-    initRenderer();
-    initScene(3);
+    initCanvas(3);
+    initCamera();
+    initListeners();
     initPolygon();
     initLine();
 }
 
-function initScene(sceneCount){
+function animate() {
+    requestAnimationFrame( animate );
+
+    for(var i=0; i<renderers.length; i++){
+        renderers[i].render(scenes[i], camera);
+    }
+}
+
+function initCanvas(canvasCount = 1){
+    for(var i=0; i<canvasCount; i++){
+        canvases.push(createCanvas(containers[i]));
+    }
+}
+
+function createCanvas(container){
+    var canvas = document.createElement( 'canvas' );
+
+    var renderer = createRenderer(canvas);
+    renderers.push(renderer);
+    container.appendChild(renderer.domElement);
+
+    var scene = new THREE.Scene();
+    scenes.push(scene);
+
+    return canvas;
+}
+
+function createRenderer(canvas){
+    var context = canvas.getContext( 'webgl2', { alpha: true } );
+    var renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context, antialias:true } );
+    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+    //renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    //renderer.toneMappingExposure = 0.8;    
+    renderer.outputEncoding = THREE.sRGBEncoding;   
+
+    return renderer;
+}
+
+function initCamera(){
     var w = window.innerWidth;
     var h = window.innerHeight;
     var aspectRatio = w / h;
@@ -75,10 +118,17 @@ function initScene(sceneCount){
 
     camera.position.set( 0, 0, 0);
     camera.lookAt( 0, 0, 0 );
-    
-    for(var i=0; i<sceneCount; i++)
-        scenes.push(new THREE.Scene());
+}
 
+/*
+function onWindowResize(){
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    scenes[0].setSize( window.innerWidth, window.innerHeight );
+}
+*/
+
+function initListeners(){
     //window.addEventListener( 'resize', onWindowResize, false );
     window.addEventListener( 'click', onDocumentMouseClick, false );
     window.addEventListener( 'mousemove', onDocumentMouseMove, false );
@@ -124,9 +174,7 @@ function triangulate(){
 
     findDiagonals();
 
-    createGraph();
-
-    twoColorGraph();
+    twoColorGraph(scenes[2]);
 }
 
 function createGraph(){
@@ -142,7 +190,9 @@ function createGraph(){
     }
 }
 
-function twoColorGraph(){
+function twoColorGraph(scene){
+    createGraph();
+
     var coloredIndices = [];
     for(i=0; i<graph.length; i++) coloredIndices.push(0);
     var coloredNodeCount = 0;
@@ -151,7 +201,7 @@ function twoColorGraph(){
             if(coloredIndices[i]!=0)
                 continue;
             
-            drawLine(diagonals[i], scenes[2]);
+            drawLine(diagonals[i], scene);
             coloredIndices[i] = 1;
             coloredNodeCount++;
 
@@ -288,46 +338,6 @@ function tryEnableButton(){
 
 function canTriangulate(){
     return polygon.getPointCount()>=3;
-}
-
-
-function addRenderer(container){
-    var canvas = document.createElement( 'canvas' );
-    var context = canvas.getContext( 'webgl2', { alpha: true } );
-    var renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context, antialias:true } );
-    renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
-
-    //renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    //renderer.toneMappingExposure = 0.8;    
-    renderer.outputEncoding = THREE.sRGBEncoding;   
-    
-    container.appendChild(renderer.domElement);
-
-    canvases.push(canvas);
-    renderers.push(renderer);
-}
-
-function initRenderer(){
-    addRenderer(inputContainer);
-    addRenderer(container2);
-    addRenderer(container3);
-}
-
-/*
-function onWindowResize(){
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    scenes[0].setSize( window.innerWidth, window.innerHeight );
-}
-*/
-
-function animate() {
-    requestAnimationFrame( animate );
-
-    for(var i=0; i<renderers.length; i++){
-        renderers[i].render(scenes[i], camera);
-    }
 }
 
 function initPolygon(){
