@@ -174,6 +174,8 @@ class MotionPlanning extends Page{
 
         reset.style.visibility = 'visible';
 
+        
+
     }
 
     cloneScene(){
