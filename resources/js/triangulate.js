@@ -15,8 +15,9 @@ const matLite = new THREE.MeshBasicMaterial( {
 } );
 
 
-class Triangulate{
+class Triangulate extends Page{
     constructor(){
+        super();
         this.polygon;
         this.line;
         this.isLineActive = false;

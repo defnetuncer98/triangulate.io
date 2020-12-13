@@ -1,48 +1,20 @@
 var currentPageIndex = 1;
-var onDocumentMouseClickActions = [];
-var onDocumentMouseMoveActions = [];
-var onClickedReadyButtonActions = [];
-var onLeftReadyButtonActions = [];
-var onEnteredReadyButtonActions = [];
-var onClickedResetButtonActions = [];
-var onLeftResetButtonActions = [];
-var onEnteredResetButtonActions = [];
 
 var pages = [];
-
-var home;
-var triangulate;
 
 init();
 
 function init(){
     initPages();
     initListeners();
-    pages[currentPageIndex]();
+    pages[currentPageIndex].init();
 }
 
 function initPages(){
-    home = new Home();
-    onDocumentMouseClickActions.push(function(){home.onMouseClick()});
-    onDocumentMouseMoveActions.push(function(){home.onMouseMove()});
-    onClickedReadyButtonActions.push(function(){home.onClickedReadyButton()});
-    onClickedResetButtonActions.push(function(){home.onClickedResetButton()});
-    onEnteredResetButtonActions.push(function(){home.onEnteredResetButton()});
-    onEnteredReadyButtonActions.push(function(){home.onEnteredReadyButton()});
-    onLeftResetButtonActions.push(function(){home.onLeftResetButton()});
-    onLeftReadyButtonActions.push(function(){home.onLeftReadyButton()});
-    pages.push(function(){home.init()});
-
-    triangulate = new Triangulate();
-    onDocumentMouseClickActions.push(function(){triangulate.onMouseClick()});
-    onDocumentMouseMoveActions.push(function(){triangulate.onMouseMove()});
-    onClickedReadyButtonActions.push(function(){triangulate.onClickedReadyButton()});
-    onClickedResetButtonActions.push(function(){triangulate.onClickedResetButton()});
-    onEnteredResetButtonActions.push(function(){triangulate.onEnteredResetButton()});
-    onEnteredReadyButtonActions.push(function(){triangulate.onEnteredReadyButton()});
-    onLeftResetButtonActions.push(function(){triangulate.onLeftResetButton()});
-    onLeftReadyButtonActions.push(function(){triangulate.onLeftReadyButton()});
-    pages.push(function(){triangulate.init()});
+    var home = new Home();
+    pages.push(home);
+    var triangulate = new Triangulate();
+    pages.push(triangulate);
 }
 
 function getInputOnScreen( event ){
@@ -90,7 +62,7 @@ function mouseLeftNavButton(){
 function onDocumentMouseClick( event ) {
     getInputOnScreen(event);
 
-    onDocumentMouseClickActions[currentPageIndex]();
+    pages[currentPageIndex].onMouseClick();
 }
 
 function onDocumentMouseMove( event ) {
@@ -98,29 +70,29 @@ function onDocumentMouseMove( event ) {
 
     updateCursor();
 
-    onDocumentMouseMoveActions[currentPageIndex]();
+    pages[currentPageIndex].onMouseMove();
 }
 
 function onClickedReadyButton(){
-    onClickedReadyButtonActions[currentPageIndex]();
+    pages[currentPageIndex].onClickedReadyButton();
 }
 
 function onLeftReadyButton(){
-    onLeftReadyButtonActions[currentPageIndex]();
+    pages[currentPageIndex].onLeftReadyButton();
 }
 
 function onEnteredReadyButton(){
-    onEnteredReadyButtonActions[currentPageIndex]();
+    pages[currentPageIndex].onEnteredReadyButton();
 }
 
 function onClickedResetButton(){
-    onClickedResetButtonActions[currentPageIndex]();
+    pages[currentPageIndex].onClickedResetButton();
 }
 
 function onLeftResetButton(){
-    onLeftResetButtonActions[currentPageIndex]();
+    pages[currentPageIndex].onLeftResetButton();
 }
 
 function onEnteredResetButton(){
-    onEnteredResetButtonActions[currentPageIndex]();
+    pages[currentPageIndex].onEnteredResetButton();
 }

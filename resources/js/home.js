@@ -1,5 +1,6 @@
-class Home{
+class Home extends Page{
     constructor(){
+        super();
     }
 
     init(){
