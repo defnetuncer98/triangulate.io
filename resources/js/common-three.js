@@ -16,3 +16,55 @@ function createText(font, message, x, y, z, size, mat){
     text.name=name;
     return text;
 }
+
+function drawLine(line, scene){
+    var lineGeometry = createLineGeometry(2, lineBasicMaterial_03);
+    lineGeometry.geometry.setDrawRange( 0, 2 );
+    const linePoints = lineGeometry.geometry.attributes.position.array;
+    linePoints[0] = line.start.x;
+    linePoints[1] = line.start.y;
+    linePoints[2] = line.start.z;
+    linePoints[3] = line.end.x
+    linePoints[4] = line.end.y;
+    linePoints[5] = line.end.z;
+    scene.add(lineGeometry);
+}
+
+function createLineGeometry(point_count, mat = lineBasicMaterial_02){
+    const geometry = new THREE.BufferGeometry();
+
+    const positions = new Float32Array( point_count * 3 );
+    geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+
+    const line = new THREE.Line( geometry,  mat );
+
+    const points = line.geometry.attributes.position.array;
+
+    let x, y, z, index;
+    x = y = z = index = 0;
+
+    for ( let i = 0, l = point_count; i < l; i ++ ) {
+        points[ index ++ ] = x;
+        points[ index ++ ] = y;
+        points[ index ++ ] = z;
+    }
+
+    return line;
+}
+
+function createPointGeometry(point, mat = dotMaterial){
+    const geometry = new THREE.BufferGeometry();
+
+    const positions = new Float32Array( 3 );
+    geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+
+    const dot = new THREE.Points( geometry, mat );
+
+    const points = dot.geometry.attributes.position.array;
+
+    points[0] = point.x;
+    points[1] = point.y;
+    points[2] = point.z;
+
+    return dot;
+}

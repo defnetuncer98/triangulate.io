@@ -49,3 +49,7 @@ function hideButtons(){
     ready.style.visibility = 'hidden';
     reset.style.visibility = 'hidden';
 }
+
+function setCursorInfo(text){
+    cursorInfo.innerHTML = text;
+}

@@ -36,6 +36,16 @@ canvas {
     position: absolute;
 }
 
+#cursor-info {
+    position: absolute;
+    bottom: 10px;
+    background-color: transparent;
+    color: rgba(255, 255, 255, 1);
+    border: 0px;
+    font-size: 1rem;
+    font-family: 'Roboto', sans-serif;
+}
+
 .gridcontainer {
     position: absolute;
     display: grid;

@@ -39,6 +39,8 @@ const page2button = document.getElementById("page2");
 const page3button = document.getElementById("page3");
 const page4button = document.getElementById("page4");
 
+const cursorInfo = document.getElementById("cursor-info");
+
 const colorPalette_01 = 0xffffff;
 const colorPalette_02 = 0x6495ED;
 const colorPalette_03 = 0x7FFF00;
@@ -54,6 +56,8 @@ const matLite = new THREE.MeshBasicMaterial( {
     opacity: 0.4,
     side: THREE.DoubleSide
 } );
+
+const dotMaterial = new THREE.PointsMaterial( { size: 10, sizeAttenuation: false, color: colorPalette_01 } );
 
 
 init();
