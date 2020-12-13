@@ -63,30 +63,52 @@ class MotionPlanning extends Page{
 
         if(this.isButtonClicked){
             if(!this.isStartPointSelected){
+                this.onSelectStartPoint();
                 this.isStartPointSelected = true;
-                this.updateStartPoint(input);
-                setCursorInfo('Select end point');
             }
             else{
-                this.updateEndPoint(input);
-                this.startPlanningMotion();
-                setCursorInfo('');
+                this.onSelectEndPoint();
             }
-
             return;
         }
     
         if(this.isLineActive){
-            var newLine = new THREE.Line3(this.line.getStart(), this.line.getEnd());
-            this.lines.push(newLine);
-            drawLine(newLine, scenes[0]);
+            this.onSelectNewLineEndPoint();
             this.isLineActive = false;
-            ready.style.visibility = 'visible';
         }
         else{
+            this.onSelectNewLineStartPoint();
             this.isLineActive = true;
-            this.line.updateLine(input, input);
         }
+    }
+
+    writeAboveInput(text, scene){
+        var textPos = new THREE.Vector3(input.x, input.y + 20, input.z);
+        drawText(text, textPos, scene, './resources/fonts/Roboto_Regular.json', matLite);
+    }
+
+    onSelectNewLineEndPoint(){
+        var newLine = new THREE.Line3(this.line.getStart(), this.line.getEnd());
+        this.lines.push(newLine);
+        drawLine(newLine, scenes[0]);
+        ready.style.visibility = 'visible';
+    }
+
+    onSelectNewLineStartPoint(){
+        this.line.updateLine(input, input);
+    }
+
+    onSelectStartPoint(){
+        this.updateStartPoint(input);
+        setCursorInfo('Select end point');
+        this.writeAboveInput('start point', scenes[0]);
+    }
+
+    onSelectEndPoint(){
+        this.updateEndPoint(input);
+        this.startPlanningMotion();
+        setCursorInfo('');
+        this.writeAboveInput('end point', scenes[0]);
     }
     
     onMouseMove(){
