@@ -1,6 +1,10 @@
 class Triangulate extends Page{
     constructor(){
         super();
+        this.initVariables();
+    }
+        
+    initVariables(){
         this.polygon;
         this.line;
         this.isLineActive = false;
@@ -10,33 +14,10 @@ class Triangulate extends Page{
         this.graph = [];
     }
 
-
-    onMouseClick(){
-        if(isButtonHovered || this.isButtonClicked || input.distanceTo(this.polygon.getLastPoint()) < this.distanceThreshold)
-            return;
-    
-        this.polygon.addPoint(input);
-    
-        this.isLineActive = true;
-    
-        if(this.polygon.getPointCount()>=3)
-            ready.style.visibility = 'visible';
-    
-        var textPos = new THREE.Vector3(input.x, input.y + 10, input.z);
-        drawText(letters[this.polygon.getPointCount()-1], textPos, scenes[0], './resources/fonts/Roboto_Regular.json', matLite);
-    }
-    
-    onMouseMove(){
-        if(!this.isLineActive || isButtonHovered || this.isButtonClicked)
-            return;
-        
-        this.updateLine();
-    }
-    
     init(){
         resetAll();
-        this.resetGlobals();
-    
+
+        this.initVariables();
         this.initInfo();
         this.initPolygon();
         this.initLine();
@@ -49,7 +30,7 @@ class Triangulate extends Page{
         step2.innerHTML = "STEP 2 | Internal Diagonals";
         step3.innerHTML = "STEP 3 | Two Coloring Graph";
     }
-    
+
     initPolygon(){
         this.polygon = new Polygon();
         scenes[0].add( this.polygon.polygon );
@@ -71,6 +52,28 @@ class Triangulate extends Page{
         const lastPoint = this.polygon.getLastPoint();
         this.line.updateLine(lastPoint, firstPoint);
         this.line.updateLineMat(lineBasicMaterial_02);
+    }
+    
+    onMouseClick(){
+        if(isButtonHovered || this.isButtonClicked || input.distanceTo(this.polygon.getLastPoint()) < this.distanceThreshold)
+            return;
+    
+        this.polygon.addPoint(input);
+    
+        this.isLineActive = true;
+    
+        if(this.polygon.getPointCount()>=3)
+            ready.style.visibility = 'visible';
+    
+        var textPos = new THREE.Vector3(input.x, input.y + 10, input.z);
+        drawText(letters[this.polygon.getPointCount()-1], textPos, scenes[0], './resources/fonts/Roboto_Regular.json', matLite);
+    }
+    
+    onMouseMove(){
+        if(!this.isLineActive || isButtonHovered || this.isButtonClicked)
+            return;
+        
+        this.updateLine();
     }
     
     onEnteredReadyButton(){
@@ -106,14 +109,7 @@ class Triangulate extends Page{
     onLeftResetButton(){
         isButtonHovered = false;
     }
-    
-    resetGlobals(){
-        this.isLineActive = false;
-        this.isButtonClicked = false;
-        this.diagonals = [];
-        this.graph = [];
-    }
-    
+
     onClickedReadyButton(){
         this.isButtonClicked = true;
         ready.style.visibility = 'hidden';
