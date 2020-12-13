@@ -1,4 +1,4 @@
-var currentPageIndex = 1;
+var currentPageIndex = 2;
 
 var pages = [];
 
@@ -11,10 +11,9 @@ function init(){
 }
 
 function initPages(){
-    var home = new Home();
-    pages.push(home);
-    var triangulate = new Triangulate();
-    pages.push(triangulate);
+    pages.push(new Home());
+    pages.push(new Triangulate());
+    pages.push(new MotionPlanning());
 }
 
 function getInputOnScreen( event ){
@@ -47,7 +46,7 @@ function initListeners(){
 }
 
 function changePage(pageIndex){
-    pages[pageIndex]();
+    pages[pageIndex].init();
     currentPageIndex = pageIndex;
 }
 

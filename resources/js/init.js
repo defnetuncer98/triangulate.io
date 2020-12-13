@@ -39,6 +39,23 @@ const page2button = document.getElementById("page2");
 const page3button = document.getElementById("page3");
 const page4button = document.getElementById("page4");
 
+const colorPalette_01 = 0xffffff;
+const colorPalette_02 = 0x6495ED;
+const colorPalette_03 = 0x7FFF00;
+
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+const lineBasicMaterial_01 = new THREE.LineBasicMaterial( { color: colorPalette_01, transparent: true, opacity : 0.3 } );
+const lineBasicMaterial_02 = new THREE.LineBasicMaterial( { color: colorPalette_02 } );
+const lineBasicMaterial_03 = new THREE.LineBasicMaterial( { color: colorPalette_03 } );
+const matLite = new THREE.MeshBasicMaterial( {
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.4,
+    side: THREE.DoubleSide
+} );
+
+
 init();
 animate();
 
