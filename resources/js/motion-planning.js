@@ -9,7 +9,8 @@ class MotionPlanning extends Page{
         this.startPoint;
         this.endPoint;
         this.points = [];
-        this.lines = [];
+        this.obstacles = [];
+        this.edges = [];
         this.isLineActive = false;
         this.isButtonClicked = false;
         this.isStartPointSelected = false;
@@ -44,12 +45,12 @@ class MotionPlanning extends Page{
         this.endPoint = new Point(new THREE.Vector3(0,0,0));
         scenes[0].add(this.endPoint.dot);
 
-        this.points.push(new THREE.Vector3(window.innerWidth/2, window.innerHeight/2));
-        this.points.push(new THREE.Vector3(-window.innerWidth/2, window.innerHeight/2));
-        this.points.push(new THREE.Vector3(window.innerWidth/2, -window.innerHeight/2));
-        this.points.push(new THREE.Vector3(-window.innerWidth/2, -window.innerHeight/2));
+        this.points.push(new THREE.Vector2(window.innerWidth/2, window.innerHeight/2));
+        this.points.push(new THREE.Vector2(-window.innerWidth/2, window.innerHeight/2));
+        this.points.push(new THREE.Vector2(window.innerWidth/2, -window.innerHeight/2));
+        this.points.push(new THREE.Vector2(-window.innerWidth/2, -window.innerHeight/2));
     }
-    
+
     updateStartPoint(point){
         this.startPoint.updatePoint(point);
     }
@@ -78,7 +79,7 @@ class MotionPlanning extends Page{
             return;
         }
     
-        this.points.push(input);
+        this.points.push(new THREE.Vector2(input.x, input.y));
 
         if(this.isLineActive){
             this.onSelectNewLineEndPoint();
@@ -97,7 +98,7 @@ class MotionPlanning extends Page{
 
     onSelectNewLineEndPoint(){
         var newLine = new THREE.Line3(this.line.getStart(), this.line.getEnd());
-        this.lines.push(newLine);
+        this.obstacles.push(newLine);
         drawLine(newLine, scenes[0], lineBasicMaterial_01);
         ready.style.visibility = 'visible';
     }
@@ -173,8 +174,6 @@ class MotionPlanning extends Page{
         this.cloneScene();
 
         reset.style.visibility = 'visible';
-
-        
 
     }
 
