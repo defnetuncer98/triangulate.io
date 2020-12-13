@@ -25,7 +25,7 @@ class Triangulate extends Page{
     
     initInfo(){
         header1.innerHTML = '<i class="icon fa fa-connectdevelop"></i> triangulation';
-        header2.innerHTML = "Polygon Triangulation by Graph Coloring <br>Click anywhere to start creating the polygon!";
+        header2.innerHTML = "Polygon Triangulation by Graph Coloring <br>Click anywhere to start creating polygon!";
         step1.innerHTML = "STEP 1 | Find Orientation";
         step2.innerHTML = "STEP 2 | Internal Diagonals";
         step3.innerHTML = "STEP 3 | Two Coloring Graph";
@@ -115,14 +115,18 @@ class Triangulate extends Page{
         ready.style.visibility = 'hidden';
         reset.style.visibility = 'visible';
     
-        scenes[1].add(this.polygon.polygon.clone());
-        scenes[1].add(this.line.line.clone());
-        scenes[2].add(this.polygon.polygon.clone());
-        scenes[2].add(this.line.line.clone());
+        this.cloneScene();
     
         showSteps();
     
         this.triangulate();
+    }
+
+    cloneScene(){
+        scenes[1].add(this.polygon.polygon.clone());
+        scenes[1].add(this.line.line.clone());
+        scenes[2].add(this.polygon.polygon.clone());
+        scenes[2].add(this.line.line.clone());
     }
     
     triangulate(){

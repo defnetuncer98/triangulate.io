@@ -8,6 +8,7 @@ class MotionPlanning extends Page{
         this.line;
         this.startPoint;
         this.endPoint;
+        this.points = [];
         this.lines = [];
         this.isLineActive = false;
         this.isButtonClicked = false;
@@ -42,6 +43,11 @@ class MotionPlanning extends Page{
 
         this.endPoint = new Point(new THREE.Vector3(0,0,0));
         scenes[0].add(this.endPoint.dot);
+
+        this.points.push(new THREE.Vector3(window.innerWidth/2, window.innerHeight/2));
+        this.points.push(new THREE.Vector3(-window.innerWidth/2, window.innerHeight/2));
+        this.points.push(new THREE.Vector3(window.innerWidth/2, -window.innerHeight/2));
+        this.points.push(new THREE.Vector3(-window.innerWidth/2, -window.innerHeight/2));
     }
     
     updateStartPoint(point){
@@ -72,6 +78,8 @@ class MotionPlanning extends Page{
             return;
         }
     
+        this.points.push(input);
+
         if(this.isLineActive){
             this.onSelectNewLineEndPoint();
             this.isLineActive = false;
@@ -90,7 +98,7 @@ class MotionPlanning extends Page{
     onSelectNewLineEndPoint(){
         var newLine = new THREE.Line3(this.line.getStart(), this.line.getEnd());
         this.lines.push(newLine);
-        drawLine(newLine, scenes[0]);
+        drawLine(newLine, scenes[0], lineBasicMaterial_01);
         ready.style.visibility = 'visible';
     }
 
@@ -161,6 +169,21 @@ class MotionPlanning extends Page{
 
     startPlanningMotion(){
         showSteps();
+
+        this.cloneScene();
+
         reset.style.visibility = 'visible';
+
     }
+
+    cloneScene(){
+        scenes[1].add(this.startPoint.dot.clone());
+        scenes[1].add(this.endPoint.dot.clone());
+        scenes[1].add(this.line.line.clone());
+
+        scenes[2].add(this.startPoint.dot.clone());
+        scenes[2].add(this.endPoint.dot.clone());
+        scenes[2].add(this.line.line.clone());
+    }
+
 }
