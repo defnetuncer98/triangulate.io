@@ -9,7 +9,7 @@ class MotionPlanning extends Page{
     }
 
     initInfo(){
-        header1.innerHTML = "motion-planning";
+        header1.innerHTML = '<i class="icon fa fa-bolt"></i> motion-planning';
         header2.innerHTML = "Motion Planning for Point Agents on Plane with Line Segment Obstacles";
         step1.innerHTML = "STEP 1 | ";
         step2.innerHTML = "STEP 2 | ";

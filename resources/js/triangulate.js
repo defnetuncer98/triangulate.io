@@ -43,7 +43,7 @@ class Triangulate extends Page{
     }
     
     initInfo(){
-        header1.innerHTML = "triangulateMe";
+        header1.innerHTML = '<i class="icon fa fa-connectdevelop"></i> triangulation';
         header2.innerHTML = "Polygon Triangulation by Graph Coloring";
         step1.innerHTML = "STEP 1 | Find Orientation";
         step2.innerHTML = "STEP 2 | Internal Diagonals";
