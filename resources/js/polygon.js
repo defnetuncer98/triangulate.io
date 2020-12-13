@@ -70,7 +70,7 @@ class Polygon {
     }
 
     getTrio(index, orientation=true){
-        return new Trio(polygon, index, orientation);
+        return new Trio(this, index, orientation);
     }
 
     addPoint(point){    
