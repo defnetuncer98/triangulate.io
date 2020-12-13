@@ -25,17 +25,17 @@ function isRight(line, p){
     return !isLeft(line,p);
 }
 
-function drawLine(d, scene){
-    var line = createLineGeometry(2, lineBasicMaterial_03);
-    line.geometry.setDrawRange( 0, 2 );
-    const linePoints = line.geometry.attributes.position.array;
-    linePoints[0] = d.start.x;
-    linePoints[1] = d.start.y;
-    linePoints[2] = d.start.z;
-    linePoints[3] = d.end.x
-    linePoints[4] = d.end.y;
-    linePoints[5] = d.end.z;
-    scene.add(line);
+function drawLine(line, scene){
+    var lineGeometry = createLineGeometry(2, lineBasicMaterial_03);
+    lineGeometry.geometry.setDrawRange( 0, 2 );
+    const linePoints = lineGeometry.geometry.attributes.position.array;
+    linePoints[0] = line.start.x;
+    linePoints[1] = line.start.y;
+    linePoints[2] = line.start.z;
+    linePoints[3] = line.end.x
+    linePoints[4] = line.end.y;
+    linePoints[5] = line.end.z;
+    scene.add(lineGeometry);
 }
 
 function createLineGeometry(point_count, mat = lineBasicMaterial_02){

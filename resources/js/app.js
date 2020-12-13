@@ -46,8 +46,8 @@ function initListeners(){
 }
 
 function changePage(pageIndex){
-    pages[pageIndex].init();
     currentPageIndex = pageIndex;
+    pages[currentPageIndex].init();
 }
 
 function mouseEnteredNavButton(){
