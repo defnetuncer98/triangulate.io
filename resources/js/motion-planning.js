@@ -28,7 +28,7 @@ class MotionPlanning extends Page{
     initInfo(){
         header1.innerHTML = '<i class="icon fa fa-bolt"></i> motion-planning';
         header2.innerHTML = "Motion Planning for Point Agents on Plane with Line Segment Obstacles <br> Click anywhere to create line segments!";
-        step1.innerHTML = "STEP 1 | ";
+        step1.innerHTML = "STEP 1 | Delaunay";
         step2.innerHTML = "STEP 2 | ";
         step3.innerHTML = "STEP 3 | ";
     }
@@ -45,10 +45,10 @@ class MotionPlanning extends Page{
         this.endPoint = new Point(new THREE.Vector3(0,0,0));
         scenes[0].add(this.endPoint.dot);
 
-        this.points.push(new THREE.Vector3(window.innerWidth/2, window.innerHeight/2, 0));
-        this.points.push(new THREE.Vector3(-window.innerWidth/2, window.innerHeight/2, 0));
-        this.points.push(new THREE.Vector3(window.innerWidth/2, -window.innerHeight/2, 0));
-        this.points.push(new THREE.Vector3(-window.innerWidth/2, -window.innerHeight/2, 0));
+        this.points.push(new THREE.Vector3(window.innerWidth/2.1, window.innerHeight/2.1, 0));
+        this.points.push(new THREE.Vector3(-window.innerWidth/11, window.innerHeight/2.1, 0));
+        this.points.push(new THREE.Vector3(window.innerWidth/2.1, -window.innerHeight/2.1, 0));
+        this.points.push(new THREE.Vector3(-window.innerWidth/11, -window.innerHeight/2.1, 0));
     }
 
     updateStartPoint(point){
