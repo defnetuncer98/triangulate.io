@@ -143,7 +143,14 @@ class Triangulate extends Page{
         for(var i=0; i<this.polygon.getPointCount(); i++){
             var startIndex = i*3;
             var startPoint = this.polygon.getPoint(startIndex);
-            var isConvex = findAngle(this.polygon.getTrio(startIndex), orientation);
+            var trio = this.polygon.getTrio(startIndex);
+            var angle = findAngle(trio, orientation);
+
+            var isConvex = angle<180;
+
+            var textPos = new THREE.Vector3(trio.b.x, trio.b.y - 20, trio.b.z);
+            drawText(parseInt(angle)+"", textPos, scenes[1]);
+
             var trio = this.polygon.getTrio(startIndex, orientation);
     
             for(var j=i+2; j<this.polygon.getPointCount(); j++){

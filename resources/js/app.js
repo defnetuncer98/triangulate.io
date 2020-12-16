@@ -47,6 +47,7 @@ function initListeners(){
 
 function changePage(pageIndex){
     currentPageIndex = pageIndex;
+
     pages[currentPageIndex].init();
 }
 
@@ -61,7 +62,14 @@ function mouseLeftNavButton(){
 function onDocumentMouseClick( event ) {
     getInputOnScreen(event);
 
+    if(!checkInsideCanvas())
+        return;
+
     pages[currentPageIndex].onMouseClick();
+}
+
+function checkInsideCanvas(){
+    return input.x>-window.innerWidth/10;
 }
 
 function onDocumentMouseMove( event ) {

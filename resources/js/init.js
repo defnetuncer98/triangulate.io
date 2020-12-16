@@ -16,6 +16,8 @@ containers.push(document.getElementById('input-canvas'));
 containers.push(document.getElementById('canvas-2'));
 containers.push(document.getElementById('canvas-3'));
 
+const sidecontainer = document.getElementById("sidecontainer");
+
 const ready = document.getElementById("ready");
 const reset = document.getElementById("reset");
 

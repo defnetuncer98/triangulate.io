@@ -1,7 +1,7 @@
 body {
     margin: 0; 
     background: #131313;
-    cursor: none;
+    /*cursor: none;*/
     overflow-x: hidden;
     overflow-y: hidden;
 }
@@ -49,44 +49,58 @@ canvas {
 .gridcontainer {
     position: absolute;
     display: grid;
-    grid-template-columns: repeat(10, 1fr);
+    grid-template-columns: repeat(15, 1fr);
     grid-template-rows: repeat(4, 1fr);
     grid-row-gap: 10px;
 }
 
+#sidecontainer{
+    position: fixed;
+    left: 0;
+    top: 0;
+    background-color: #2a2c2f;
+    width: 40%;
+    height: 100%;
+    z-index: 2;
+    border-top-right-radius: 3%;
+    border-color: #131313;
+}
+
 .griditem1 {
     grid-column-start: 2;
-    grid-column-end: span 4;
+    grid-column-end: span 3;
     grid-row-start: 4;
 }
 
 .section {
-    color: white;
+    color:white;
     font-size: 2rem;
     font-family: 'Ubuntu', sans-serif;
+    z-index: 2;
 }
 
 .griditem2 {
     grid-column-start: 2;
-    grid-column-end: span 4;
+    grid-column-end: span 3;
     grid-row-start: 5;
 }
 
 .subtitle {
-    color: rgba(255, 255, 255, 0.4);
+    color:rgba(255, 255, 255, .3);
     font-size: 1.5rem;
     font-family: 'Roboto', sans-serif;
+    z-index: 2;
 }
 
 .griditem3 {
     grid-column-start: 2;
-    grid-column-end: span 4;
+    grid-column-end: span 3;
     grid-row-start: 7;
 }
 
 .griditem4 {
     grid-column-start: 2;
-    grid-column-end: span 4;
+    grid-column-end: span 3;
     grid-row-start: 20;
 }
 
@@ -112,14 +126,16 @@ canvas {
     grid-column-start: 2;
     grid-column-end: span 1;
     grid-row-start: 6;
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255);
     font-size: 1.5rem;
     font-family: 'Roboto', sans-serif;
     background: transparent;
     border: 1px solid;
     padding: 0.6rem 2rem;
-    z-index: 2;
+    z-index: 20;
     visibility: hidden;
+    margin-top: 40%;
+    margin-bottom: 40%;
 }
 
 .def-button:hover:enabled {
