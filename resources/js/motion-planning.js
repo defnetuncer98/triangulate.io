@@ -10,7 +10,7 @@ class MotionPlanning extends Page{
         this.endPoint;
         this.points = [];
         this.obstacles = [];
-        this.edges = [];
+        this.drawnObstacles = [];
         this.isLineActive = false;
         this.isButtonClicked = false;
         this.isStartPointSelected = false;
@@ -45,10 +45,10 @@ class MotionPlanning extends Page{
         this.endPoint = new Point(new THREE.Vector3(0,0,0));
         scenes[0].add(this.endPoint.dot);
 
-        this.points.push(new THREE.Vector2(window.innerWidth/2, window.innerHeight/2));
-        this.points.push(new THREE.Vector2(-window.innerWidth/2, window.innerHeight/2));
-        this.points.push(new THREE.Vector2(window.innerWidth/2, -window.innerHeight/2));
-        this.points.push(new THREE.Vector2(-window.innerWidth/2, -window.innerHeight/2));
+        this.points.push(new THREE.Vector3(window.innerWidth/2, window.innerHeight/2, 0));
+        this.points.push(new THREE.Vector3(-window.innerWidth/2, window.innerHeight/2, 0));
+        this.points.push(new THREE.Vector3(window.innerWidth/2, -window.innerHeight/2, 0));
+        this.points.push(new THREE.Vector3(-window.innerWidth/2, -window.innerHeight/2, 0));
     }
 
     updateStartPoint(point){
@@ -79,7 +79,7 @@ class MotionPlanning extends Page{
             return;
         }
     
-        this.points.push(new THREE.Vector2(input.x, input.y));
+        this.points.push(new THREE.Vector3(input.x, input.y, 0));
 
         if(this.isLineActive){
             this.onSelectNewLineEndPoint();
@@ -99,7 +99,7 @@ class MotionPlanning extends Page{
     onSelectNewLineEndPoint(){
         var newLine = new THREE.Line3(this.line.getStart(), this.line.getEnd());
         this.obstacles.push(newLine);
-        drawLine(newLine, scenes[0], lineBasicMaterial_01);
+        this.drawnObstacles.push(drawLine(newLine, scenes[0], lineBasicMaterial_04));
         ready.style.visibility = 'visible';
     }
 
@@ -175,16 +175,32 @@ class MotionPlanning extends Page{
 
         reset.style.visibility = 'visible';
 
+        this.line.setInvisible();
+
+        var vertices = [[]];
+        for(var i=0; i<this.points.length; i++){
+            vertices[i] = [0, 0];
+            vertices[i][0] = this.points[i].x;
+            vertices[i][1] = this.points[i].y;
+        }
+
+        var triangles = Delaunay.triangulate(vertices);
+
+        var edges = [[]];
+
+        for(var i=0; i<this.drawnObstacles.length; i++)
+            scenes[0].remove(this.drawnObstacles[i]);
+
+        for(var i=0; i<triangles.length/3; i++)
+            drawTriangle(this.points[triangles[i*3]], this.points[triangles[(i*3)+1]], this.points[triangles[(i*3)+2]], scenes[0], lineDashed_01);
     }
 
     cloneScene(){
         scenes[1].add(this.startPoint.dot.clone());
         scenes[1].add(this.endPoint.dot.clone());
-        scenes[1].add(this.line.line.clone());
 
         scenes[2].add(this.startPoint.dot.clone());
         scenes[2].add(this.endPoint.dot.clone());
-        scenes[2].add(this.line.line.clone());
     }
 
 }

@@ -17,7 +17,7 @@ function createText(font, message, x, y, z, size, mat){
     return text;
 }
 
-function drawLine(line, scene, mat=lineBasicMaterial_03){
+function drawLine(line, scene, mat){
     var lineGeometry = createLineGeometry(2, mat);
     lineGeometry.geometry.setDrawRange( 0, 2 );
     const linePoints = lineGeometry.geometry.attributes.position.array;
@@ -28,6 +28,13 @@ function drawLine(line, scene, mat=lineBasicMaterial_03){
     linePoints[4] = line.end.y;
     linePoints[5] = line.end.z;
     scene.add(lineGeometry);
+    return lineGeometry;
+}
+
+function drawTriangle(a, b, c, scene, mat){
+    drawLine(new THREE.Line3(a,b), scene, mat);
+    drawLine(new THREE.Line3(b,c), scene, mat);
+    drawLine(new THREE.Line3(a,c), scene, mat);
 }
 
 function createLineGeometry(point_count, mat = lineBasicMaterial_02){

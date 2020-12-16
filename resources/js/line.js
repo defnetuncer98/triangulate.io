@@ -5,6 +5,14 @@ class Line {
         this.linePoints = this.line.geometry.attributes.position.array;
     }
 
+    setInvisible(){
+        this.line.geometry.setDrawRange( 0, 0 );
+    }
+
+    setVisible(){
+        this.line.geometry.setDrawRange( 0, 2 );
+    }
+
     updateLineMat(mat){
         this.line.material = mat;
     }
