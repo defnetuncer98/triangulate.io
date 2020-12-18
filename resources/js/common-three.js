@@ -31,12 +31,6 @@ function drawLine(line, scene, mat=lineBasicMaterial_03){
     return lineGeometry;
 }
 
-function drawTriangle(a, b, c, scene, mat){
-    drawLine(new THREE.Line3(a,b), scene, mat);
-    drawLine(new THREE.Line3(b,c), scene, mat);
-    drawLine(new THREE.Line3(a,c), scene, mat);
-}
-
 function createLineGeometry(point_count, mat = lineBasicMaterial_02){
     const geometry = new THREE.BufferGeometry();
 

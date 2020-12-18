@@ -53,19 +53,14 @@ const lineBasicMaterial_01 = new THREE.LineBasicMaterial( { color: colorPalette_
 const lineBasicMaterial_04 = new THREE.LineBasicMaterial( { color: colorPalette_01, transparent: true, linewidth: 20} );
 
 const lineBasicMaterial_02 = new THREE.LineBasicMaterial( { color: colorPalette_02 } );
+const lineDashed_01 = new THREE.LineDashedMaterial( { color: colorPalette_02, dashSize: 10, gapSize: 10, opacity: 0.1 });
 
 const lineBasicMaterial_03 = new THREE.LineBasicMaterial( { color: colorPalette_03 } );
 const lineBasicMaterial_05 = new THREE.LineBasicMaterial( { color: colorPalette_03, opacity: 0.3 } );
 
-const lineDashed_01 = new THREE.LineDashedMaterial( { color: colorPalette_02, dashSize: 2, gapSize: 3, opacity: 0.1 });
-
-
-const matLite = new THREE.MeshBasicMaterial( {
-    color: 0xffffff,
-    transparent: true,
-    opacity: 0.4,
-    side: THREE.DoubleSide
-} );
+const matLite = new THREE.MeshBasicMaterial( { color: colorPalette_01, transparent: true, opacity: 0.4, side: THREE.DoubleSide } );
+const matLite_02 = new THREE.MeshBasicMaterial( { color: colorPalette_02, transparent: true, opacity: 0.4, side: THREE.DoubleSide } );
+const matLite_03 = new THREE.MeshBasicMaterial( { color: colorPalette_03, transparent: true, opacity: 0.4, side: THREE.DoubleSide } );
 
 const dotMaterial = new THREE.PointsMaterial( { size: 10, sizeAttenuation: false, color: colorPalette_01 } );
 
