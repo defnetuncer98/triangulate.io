@@ -1,11 +1,14 @@
 class Point{
     constructor(point){
+        this.point = point;
         this.dot = createPointGeometry(point);
         this.dotPoints = this.dot.geometry.attributes.position.array;
         this.dot.geometry.setDrawRange( 0, 0 );
     }
 
     updatePoint(point){
+        this.point = new THREE.Vector3(point.x,point.y,point.z);
+
         this.dotPoints[0] = point.x;
         this.dotPoints[1] = point.y;
         this.dotPoints[2] = 0;

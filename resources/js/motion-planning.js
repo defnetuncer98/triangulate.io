@@ -210,11 +210,17 @@ class MotionPlanning extends Page{
 
         var weightedMap = {};
 
+        weightedMap['s']={};
+        weightedMap['e']={};
+
+        var startPos = new THREE.Vector3(this.startPoint.point.x, this.startPoint.point.y, this.startPoint.point.z);
+        var endPos = new THREE.Vector3(this.endPoint.point.x, this.endPoint.point.y, this.endPoint.point.z);
+        
         for(var i=0; i<triangles.length/3; i++){
             var a = triangles[(i*3)];
             var b = triangles[(i*3)+1];
             var c = triangles[(i*3)+2];
-
+            
             var mid1 = (this.points[a].clone().add(this.points[b])).divideScalar(2);
             var mid2 = (this.points[a].clone().add(this.points[c])).divideScalar(2);
             var mid3 = (this.points[b].clone().add(this.points[c])).divideScalar(2);
@@ -246,9 +252,59 @@ class MotionPlanning extends Page{
             this.addToWeightedMap(edge1,edge2,dist1,weightedMap);
             this.addToWeightedMap(edge1,edge3,dist2,weightedMap);
             this.addToWeightedMap(edge2,edge3,dist3,weightedMap);
+
+            
+            if(this.isInsideTriangle(startPos, this.points[a],this.points[b],this.points[c])){
+                var dist11 = mid1.distanceTo(startPos);
+                drawLine(new THREE.Line3(startPos,mid1), scenes[0]);
+                var dist21 = mid2.distanceTo(startPos);
+                drawLine(new THREE.Line3(mid2,startPos), scenes[0]);
+                var dist31 = mid3.distanceTo(startPos);
+                drawLine(new THREE.Line3(mid3,startPos), scenes[0]);
+
+                this.addToWeightedMap('s',edge1,dist11,weightedMap);
+                this.addToWeightedMap('s',edge2,dist21,weightedMap);
+                this.addToWeightedMap('s',edge3,dist31,weightedMap);
+            }
+
+            if(this.isInsideTriangle(endPos, this.points[a],this.points[b],this.points[c])){
+                var dist11 = mid1.distanceTo(endPos);
+                drawLine(new THREE.Line3(endPos,mid1), scenes[0]);
+                var dist21 = mid2.distanceTo(endPos);
+                drawLine(new THREE.Line3(mid2,endPos), scenes[0]);
+                var dist31 = mid3.distanceTo(endPos);
+                drawLine(new THREE.Line3(mid3,endPos), scenes[0]);
+
+                this.addToWeightedMap('e',edge1,dist11,weightedMap);
+                this.addToWeightedMap('e',edge2,dist21,weightedMap);
+                this.addToWeightedMap('e',edge3,dist31,weightedMap);
+            }
         }
 
         this.graph = new Graph(weightedMap);
+
+        var shortestPath = this.graph.findShortestPath('s','e');
+        
+        console.log(shortestPath);
+    }
+
+    sign (p1,p2,p3)
+    {
+        return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+    }
+
+    isInsideTriangle(point,a,b,c){
+        var d1, d2, d3;
+        var has_neg, has_pos;
+
+        d1 = this.sign(point,a,b);
+        d2 = this.sign(point,b,c);
+        d3 = this.sign(point,c,a);
+
+        has_neg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+        has_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+
+        return !(has_neg && has_pos);
     }
 
     addToWeightedMap(edge1, edge2, dist, weightedMap){
