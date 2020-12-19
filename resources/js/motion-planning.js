@@ -264,7 +264,7 @@ class MotionPlanning extends Page{
             var isStartInTriangle = this.isInsideTriangle(startPos, triangleVertices[0], triangleVertices[1], triangleVertices[2]);
             var isEndInTriangle = this.isInsideTriangle(endPos, triangleVertices[0], triangleVertices[1], triangleVertices[2]);
 
-            if(isStartInTriangle && isEndInTriangle) this.addToWeightedMap(start,end,weightedMap);
+            if(isStartInTriangle && isEndInTriangle) this.tryAddToWeightedMap(start,end,weightedMap);
 
             for(var j=0; j<triangleEdges.length; j++){
                 var edge1 = triangleEdges[j];
@@ -272,8 +272,8 @@ class MotionPlanning extends Page{
                 if(this.edgeIsObstacle(edge1))
                     continue;
 
-                if(isStartInTriangle) this.addToWeightedMap(start,edge1,weightedMap);
-                if(isEndInTriangle) this.addToWeightedMap(end,edge1,weightedMap);
+                if(isStartInTriangle) this.tryAddToWeightedMap(start,edge1,weightedMap);
+                if(isEndInTriangle) this.tryAddToWeightedMap(end,edge1,weightedMap);
 
                 for(var k=j+1; k<triangleEdges.length; k++){
                     var edge2 = triangleEdges[k];
@@ -281,7 +281,7 @@ class MotionPlanning extends Page{
                     if(this.edgeIsObstacle(edge2))
                         continue;
 
-                    this.addToWeightedMap(edge1,edge2,weightedMap);
+                    this.tryAddToWeightedMap(edge1,edge2,weightedMap);
                 }
             }
         }
@@ -322,7 +322,19 @@ class MotionPlanning extends Page{
         return !(has_neg && has_pos);
     }
 
-    addToWeightedMap(edge1, edge2, weightedMap){
+    isIllegalPath(p1, p2){
+        for(var i=0; i<this.obstacles.length; i++){
+            if(isIntersecting(this.obstacles[i], new THREE.Line3(p1,p2))) return true;
+        }
+
+        return false;
+    }
+
+    tryAddToWeightedMap(edge1, edge2, weightedMap){
+
+        if(this.isIllegalPath(edge1.mid,edge2.mid))
+            return;
+        
         //drawLine(new THREE.Line3(edge1.mid,edge2.mid), scenes[0], lineDashed_02);
 
         var dist = edge1.mid.distanceTo(edge2.mid);
@@ -349,14 +361,8 @@ class MotionPlanning extends Page{
         var min = Math.min(edge.a,edge.b);
         var max = Math.max(edge.a,edge.b);
 
-        if(!(min in edgeMap)){
+        if(!(min in edgeMap))
             edgeMap[min] = {};
-            edgeMap[min][max] = edge.edgeId;
-            edges[edge.edgeId] = edge;
-            this.writeOnPos(parseInt(edge.edgeId)+"", scenes[0], edge.mid, 20, matLite_02);
-            drawLine(new THREE.Line3(edge.pa,edge.pb), scenes[0], lineDashed_01);
-            return true;
-        }
 
         if(!(max in edgeMap[min])){
             edgeMap[min][max] = edge.edgeId;
