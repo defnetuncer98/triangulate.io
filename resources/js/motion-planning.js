@@ -266,13 +266,22 @@ class MotionPlanning extends Page{
 
             if(isStartInTriangle && isEndInTriangle) this.addToWeightedMap(start,end,weightedMap);
 
-            for(var j=0; j<3; j++){
-                
-                if(isStartInTriangle) this.addToWeightedMap(start,triangleEdges[j],weightedMap);
-                if(isEndInTriangle) this.addToWeightedMap(end,triangleEdges[j],weightedMap);
+            for(var j=0; j<triangleEdges.length; j++){
+                var edge1 = triangleEdges[j];
 
-                for(var k=j+1; k<3; k++){
-                    this.addToWeightedMap(triangleEdges[j],triangleEdges[k],weightedMap);
+                if(this.edgeIsObstacle(edge1))
+                    continue;
+
+                if(isStartInTriangle) this.addToWeightedMap(start,edge1,weightedMap);
+                if(isEndInTriangle) this.addToWeightedMap(end,edge1,weightedMap);
+
+                for(var k=j+1; k<triangleEdges.length; k++){
+                    var edge2 = triangleEdges[k];
+
+                    if(this.edgeIsObstacle(edge2))
+                        continue;
+
+                    this.addToWeightedMap(edge1,edge2,weightedMap);
                 }
             }
         }
@@ -283,6 +292,15 @@ class MotionPlanning extends Page{
 
         for(var i=0; i<shortestPath.length-1; i++)
             drawLine(new THREE.Line3(edges[shortestPath[i]].mid, edges[shortestPath[i+1]].mid), scenes[0], lineBasicMaterial_06);
+    }
+
+    edgeIsObstacle(edge){
+        for(var i=0; i<this.obstacles.length; i++){
+            var obs = this.obstacles[i];
+            if(isSameLine(obs.start,obs.end,edge.pa,edge.pb)) return true;
+        }
+        
+        return false;
     }
 
     sign (p1,p2,p3)

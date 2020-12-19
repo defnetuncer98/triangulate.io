@@ -8,6 +8,10 @@ function isSamePoint(point1, point2){
     return point1.x==point2.x && point1.y==point2.y;
 }
 
+function isSameLine(p1s,p1e,p2s,p2e){
+    return (isSamePoint(p1s,p2s) && isSamePoint(p1e,p2e)) || (isSamePoint(p1s,p2e) && isSamePoint(p1e,p2s)) 
+}
+
 function xor(bool1, bool2){
     return bool1 != bool2;
 }
