@@ -19,7 +19,7 @@ function createText(font, message, x, y, z, size, mat){
 
 function drawLine(line, scene, mat=lineBasicMaterial_03){
     var lineGeometry = createLineGeometry(2, mat);
-    lineGeometry.geometry.setDrawRange( 0, 2 );
+    lineGeometry.computeLineDistances();
     const linePoints = lineGeometry.geometry.attributes.position.array;
     linePoints[0] = line.start.x;
     linePoints[1] = line.start.y;

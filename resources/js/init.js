@@ -46,6 +46,7 @@ const cursorInfo = document.getElementById("cursor-info");
 const colorPalette_01 = 0xffffff;
 const colorPalette_02 = 0x6495ED;
 const colorPalette_03 = 0x7FFF00;
+const colorPalette_04 = 0xFF0000;
 
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -54,9 +55,12 @@ const lineBasicMaterial_04 = new THREE.LineBasicMaterial( { color: colorPalette_
 
 const lineBasicMaterial_02 = new THREE.LineBasicMaterial( { color: colorPalette_02 } );
 const lineDashed_01 = new THREE.LineDashedMaterial( { color: colorPalette_02, dashSize: 10, gapSize: 10, opacity: 0.1 });
+const lineDashed_02 = new THREE.LineDashedMaterial( { color: colorPalette_02, scale: 1, dashSize: 3, gapSize: 1 });
 
 const lineBasicMaterial_03 = new THREE.LineBasicMaterial( { color: colorPalette_03 } );
-const lineBasicMaterial_05 = new THREE.LineBasicMaterial( { color: colorPalette_03, opacity: 0.3 } );
+const lineBasicMaterial_05 = new THREE.LineBasicMaterial( { color: colorPalette_03 } );
+
+const lineBasicMaterial_06 = new THREE.LineBasicMaterial( { color: colorPalette_04 } );
 
 const matLite = new THREE.MeshBasicMaterial( { color: colorPalette_01, transparent: true, opacity: 0.4, side: THREE.DoubleSide } );
 const matLite_02 = new THREE.MeshBasicMaterial( { color: colorPalette_02, transparent: true, opacity: 0.4, side: THREE.DoubleSide } );

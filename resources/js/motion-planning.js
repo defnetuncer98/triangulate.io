@@ -205,17 +205,21 @@ class MotionPlanning extends Page{
 
     createGraph(triangles, points){
         var edgeMap = {};
+        var edgeMidMap = {};
 
         var edgeCount = 0;
 
         var weightedMap = {};
-
+        
         weightedMap['s']={};
         weightedMap['e']={};
 
         var startPos = new THREE.Vector3(this.startPoint.point.x, this.startPoint.point.y, this.startPoint.point.z);
         var endPos = new THREE.Vector3(this.endPoint.point.x, this.endPoint.point.y, this.endPoint.point.z);
-        
+
+        edgeMidMap['s'] = startPos;
+        edgeMidMap['e'] = endPos;
+
         for(var i=0; i<triangles.length/3; i++){
             var a = triangles[(i*3)];
             var b = triangles[(i*3)+1];
@@ -227,14 +231,17 @@ class MotionPlanning extends Page{
 
             if(this.tryAddToEdgeMap(a,b,edgeMap,edgeCount,mid1)) {
                 drawLine(new THREE.Line3(this.points[a],this.points[b]), scenes[0], lineDashed_01);
+                edgeMidMap[edgeCount] = mid1;
                 edgeCount++;
             }
             if(this.tryAddToEdgeMap(a,c,edgeMap,edgeCount,mid2)) {
                 drawLine(new THREE.Line3(this.points[a],this.points[c]), scenes[0], lineDashed_01);
+                edgeMidMap[edgeCount] = mid2;
                 edgeCount++;
             }
             if(this.tryAddToEdgeMap(b,c,edgeMap,edgeCount,mid3)) {
                 drawLine(new THREE.Line3(this.points[b],this.points[c]), scenes[0], lineDashed_01);
+                edgeMidMap[edgeCount] = mid3;
                 edgeCount++;
             }
 
@@ -243,11 +250,11 @@ class MotionPlanning extends Page{
             var edge3 = this.getEdge(b,c,edgeMap);
 
             var dist1 = mid1.distanceTo(mid2);
-            drawLine(new THREE.Line3(mid1,mid2), scenes[0]);
+            //drawLine(new THREE.Line3(mid1,mid2), scenes[0], lineDashed_02);
             var dist2 = mid1.distanceTo(mid3);
-            drawLine(new THREE.Line3(mid1,mid3), scenes[0]);
+            //drawLine(new THREE.Line3(mid1,mid3), scenes[0], lineDashed_02);
             var dist3 = mid2.distanceTo(mid3);
-            drawLine(new THREE.Line3(mid2,mid3), scenes[0]);
+            //drawLine(new THREE.Line3(mid2,mid3), scenes[0], lineDashed_02);
 
             this.addToWeightedMap(edge1,edge2,dist1,weightedMap);
             this.addToWeightedMap(edge1,edge3,dist2,weightedMap);
@@ -256,11 +263,11 @@ class MotionPlanning extends Page{
             
             if(this.isInsideTriangle(startPos, this.points[a],this.points[b],this.points[c])){
                 var dist11 = mid1.distanceTo(startPos);
-                drawLine(new THREE.Line3(startPos,mid1), scenes[0]);
+                //drawLine(new THREE.Line3(startPos,mid1), scenes[0], lineDashed_02);
                 var dist21 = mid2.distanceTo(startPos);
-                drawLine(new THREE.Line3(mid2,startPos), scenes[0]);
+                //drawLine(new THREE.Line3(mid2,startPos), scenes[0], lineDashed_02);
                 var dist31 = mid3.distanceTo(startPos);
-                drawLine(new THREE.Line3(mid3,startPos), scenes[0]);
+                //drawLine(new THREE.Line3(mid3,startPos), scenes[0], lineDashed_02);
 
                 this.addToWeightedMap('s',edge1,dist11,weightedMap);
                 this.addToWeightedMap('s',edge2,dist21,weightedMap);
@@ -269,11 +276,11 @@ class MotionPlanning extends Page{
 
             if(this.isInsideTriangle(endPos, this.points[a],this.points[b],this.points[c])){
                 var dist11 = mid1.distanceTo(endPos);
-                drawLine(new THREE.Line3(endPos,mid1), scenes[0]);
+                //drawLine(new THREE.Line3(endPos,mid1), scenes[0], lineDashed_02);
                 var dist21 = mid2.distanceTo(endPos);
-                drawLine(new THREE.Line3(mid2,endPos), scenes[0]);
+                //drawLine(new THREE.Line3(mid2,endPos), scenes[0], lineDashed_02);
                 var dist31 = mid3.distanceTo(endPos);
-                drawLine(new THREE.Line3(mid3,endPos), scenes[0]);
+                //drawLine(new THREE.Line3(mid3,endPos), scenes[0], lineDashed_02);
 
                 this.addToWeightedMap('e',edge1,dist11,weightedMap);
                 this.addToWeightedMap('e',edge2,dist21,weightedMap);
@@ -285,7 +292,8 @@ class MotionPlanning extends Page{
 
         var shortestPath = this.graph.findShortestPath('s','e');
         
-        console.log(shortestPath);
+        for(var i=0; i<shortestPath.length-1; i++)
+            drawLine(new THREE.Line3(edgeMidMap[shortestPath[i]], edgeMidMap[shortestPath[i+1]]), scenes[0], lineBasicMaterial_06);
     }
 
     sign (p1,p2,p3)
