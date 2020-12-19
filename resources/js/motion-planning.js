@@ -200,14 +200,24 @@ class MotionPlanning extends Page{
         //for(var i=0; i<this.drawnObstacles.length; i++)
             //scenes[0].remove(this.drawnObstacles[i]);
         
-        this.createGraph(triangles, this.points);
+        this.createGraph(triangles);
     }
 
-    createGraph(triangles, points){
-        var edgeMap = {};
-        var edgeMidMap = {};
+    createGraph(triangles){
+        function Edge(a, b, pa, pb, edgeId) {
+            this.a = a;
+            this.b = b;
+            this.pa = pa;
+            this.pb = pb;
+            this.edgeId = edgeId;
+            this.mid = (pa.clone().add(pb)).divideScalar(2);
+        }
 
-        var edgeCount = 0;
+        var vertexEdgeMap = {};
+
+        var edges = {};
+
+        var edgeIdCount = 0;
 
         var weightedMap = {};
         
@@ -217,83 +227,62 @@ class MotionPlanning extends Page{
         var startPos = new THREE.Vector3(this.startPoint.point.x, this.startPoint.point.y, this.startPoint.point.z);
         var endPos = new THREE.Vector3(this.endPoint.point.x, this.endPoint.point.y, this.endPoint.point.z);
 
-        edgeMidMap['s'] = startPos;
-        edgeMidMap['e'] = endPos;
+        var start = new Edge('s', 's', startPos, startPos, 's');
+        start.mid = startPos;
+        edges['s'] = start;
+        
+        var end = new Edge('e', 'e', endPos, endPos, 'e');
+        end.mid = endPos;
+        edges['e'] = end;
 
         for(var i=0; i<triangles.length/3; i++){
-            var a = triangles[(i*3)];
-            var b = triangles[(i*3)+1];
-            var c = triangles[(i*3)+2];
-            
-            var mid1 = (this.points[a].clone().add(this.points[b])).divideScalar(2);
-            var mid2 = (this.points[a].clone().add(this.points[c])).divideScalar(2);
-            var mid3 = (this.points[b].clone().add(this.points[c])).divideScalar(2);
 
-            if(this.tryAddToEdgeMap(a,b,edgeMap,edgeCount,mid1)) {
-                drawLine(new THREE.Line3(this.points[a],this.points[b]), scenes[0], lineDashed_01);
-                edgeMidMap[edgeCount] = mid1;
-                edgeCount++;
+            var triangleVertices = [];
+            var triangleEdges = [];
+
+            for(var j=0; j<3; j++){
+
+                var p1 = triangles[(i*3)+j];
+
+                triangleVertices.push(this.points[p1]);
+
+                for(var k=j+1; k<3; k++){
+
+                    var p2 = triangles[(i*3)+k];
+
+                    var edge = new Edge(p1, p2, this.points[p1], this.points[p2], edgeIdCount);
+
+                    if(this.tryAddNewEdge(edge,vertexEdgeMap,edges))
+                        edgeIdCount++;
+                    else    
+                        edge = edges[this.getEdgeId(p1,p2,vertexEdgeMap)];
+
+                    triangleEdges.push(edge);
+                }
             }
-            if(this.tryAddToEdgeMap(a,c,edgeMap,edgeCount,mid2)) {
-                drawLine(new THREE.Line3(this.points[a],this.points[c]), scenes[0], lineDashed_01);
-                edgeMidMap[edgeCount] = mid2;
-                edgeCount++;
-            }
-            if(this.tryAddToEdgeMap(b,c,edgeMap,edgeCount,mid3)) {
-                drawLine(new THREE.Line3(this.points[b],this.points[c]), scenes[0], lineDashed_01);
-                edgeMidMap[edgeCount] = mid3;
-                edgeCount++;
-            }
+                                    
+            var isStartInTriangle = this.isInsideTriangle(startPos, triangleVertices[0], triangleVertices[1], triangleVertices[2]);
+            var isEndInTriangle = this.isInsideTriangle(endPos, triangleVertices[0], triangleVertices[1], triangleVertices[2]);
 
-            var edge1 = this.getEdge(a,b,edgeMap);
-            var edge2 = this.getEdge(a,c,edgeMap);
-            var edge3 = this.getEdge(b,c,edgeMap);
+            if(isStartInTriangle && isEndInTriangle) this.addToWeightedMap(start,end,weightedMap);
 
-            var dist1 = mid1.distanceTo(mid2);
-            //drawLine(new THREE.Line3(mid1,mid2), scenes[0], lineDashed_02);
-            var dist2 = mid1.distanceTo(mid3);
-            //drawLine(new THREE.Line3(mid1,mid3), scenes[0], lineDashed_02);
-            var dist3 = mid2.distanceTo(mid3);
-            //drawLine(new THREE.Line3(mid2,mid3), scenes[0], lineDashed_02);
+            for(var j=0; j<3; j++){
+                
+                if(isStartInTriangle) this.addToWeightedMap(start,triangleEdges[j],weightedMap);
+                if(isEndInTriangle) this.addToWeightedMap(end,triangleEdges[j],weightedMap);
 
-            this.addToWeightedMap(edge1,edge2,dist1,weightedMap);
-            this.addToWeightedMap(edge1,edge3,dist2,weightedMap);
-            this.addToWeightedMap(edge2,edge3,dist3,weightedMap);
-
-            
-            if(this.isInsideTriangle(startPos, this.points[a],this.points[b],this.points[c])){
-                var dist11 = mid1.distanceTo(startPos);
-                //drawLine(new THREE.Line3(startPos,mid1), scenes[0], lineDashed_02);
-                var dist21 = mid2.distanceTo(startPos);
-                //drawLine(new THREE.Line3(mid2,startPos), scenes[0], lineDashed_02);
-                var dist31 = mid3.distanceTo(startPos);
-                //drawLine(new THREE.Line3(mid3,startPos), scenes[0], lineDashed_02);
-
-                this.addToWeightedMap('s',edge1,dist11,weightedMap);
-                this.addToWeightedMap('s',edge2,dist21,weightedMap);
-                this.addToWeightedMap('s',edge3,dist31,weightedMap);
-            }
-
-            if(this.isInsideTriangle(endPos, this.points[a],this.points[b],this.points[c])){
-                var dist11 = mid1.distanceTo(endPos);
-                //drawLine(new THREE.Line3(endPos,mid1), scenes[0], lineDashed_02);
-                var dist21 = mid2.distanceTo(endPos);
-                //drawLine(new THREE.Line3(mid2,endPos), scenes[0], lineDashed_02);
-                var dist31 = mid3.distanceTo(endPos);
-                //drawLine(new THREE.Line3(mid3,endPos), scenes[0], lineDashed_02);
-
-                this.addToWeightedMap('e',edge1,dist11,weightedMap);
-                this.addToWeightedMap('e',edge2,dist21,weightedMap);
-                this.addToWeightedMap('e',edge3,dist31,weightedMap);
+                for(var k=j+1; k<3; k++){
+                    this.addToWeightedMap(triangleEdges[j],triangleEdges[k],weightedMap);
+                }
             }
         }
 
         this.graph = new Graph(weightedMap);
 
-        var shortestPath = this.graph.findShortestPath('s','e');
-        
+        var shortestPath = this.graph.findShortestPath(start.edgeId, end.edgeId);
+
         for(var i=0; i<shortestPath.length-1; i++)
-            drawLine(new THREE.Line3(edgeMidMap[shortestPath[i]], edgeMidMap[shortestPath[i+1]]), scenes[0], lineBasicMaterial_06);
+            drawLine(new THREE.Line3(edges[shortestPath[i]].mid, edges[shortestPath[i+1]].mid), scenes[0], lineBasicMaterial_06);
     }
 
     sign (p1,p2,p3)
@@ -315,45 +304,52 @@ class MotionPlanning extends Page{
         return !(has_neg && has_pos);
     }
 
-    addToWeightedMap(edge1, edge2, dist, weightedMap){
-        if(!(edge1 in weightedMap))
-            weightedMap[edge1] = {};
+    addToWeightedMap(edge1, edge2, weightedMap){
+        //drawLine(new THREE.Line3(edge1.mid,edge2.mid), scenes[0], lineDashed_02);
 
-        weightedMap[edge1][edge2] = dist;
+        var dist = edge1.mid.distanceTo(edge2.mid);
+        
+        if(!(edge1.edgeId in weightedMap))
+            weightedMap[edge1.edgeId] = {};
 
-        if(!(edge2 in weightedMap))
-            weightedMap[edge2] = {};
+        weightedMap[edge1.edgeId][edge2.edgeId] = dist;
 
-        weightedMap[edge2][edge1] = dist;
+        if(!(edge2.edgeId in weightedMap))
+            weightedMap[edge2.edgeId] = {};
+
+        weightedMap[edge2.edgeId][edge1.edgeId] = dist;
     }
 
-    getEdge(a,b,edgeMap){
+    getEdgeId(a,b,edgeMap){
         var min = Math.min(a,b);
         var max = Math.max(a,b);
 
         return edgeMap[min][max];
     }
 
-    tryAddToEdgeMap(a,b,edgeMap,edgeCount,mid){
-        var min = Math.min(a,b);
-        var max = Math.max(a,b);
+    tryAddNewEdge(edge, edgeMap, edges){
+        var min = Math.min(edge.a,edge.b);
+        var max = Math.max(edge.a,edge.b);
 
         if(!(min in edgeMap)){
             edgeMap[min] = {};
-            edgeMap[min][max] = edgeCount;
-            this.writeOnPos(parseInt(edgeCount)+"", scenes[0], mid, 20, matLite_02);
+            edgeMap[min][max] = edge.edgeId;
+            edges[edge.edgeId] = edge;
+            this.writeOnPos(parseInt(edge.edgeId)+"", scenes[0], edge.mid, 20, matLite_02);
+            drawLine(new THREE.Line3(edge.pa,edge.pb), scenes[0], lineDashed_01);
             return true;
         }
 
         if(!(max in edgeMap[min])){
-            edgeMap[min][max] = edgeCount;
-            this.writeOnPos(parseInt(edgeCount)+"", scenes[0], mid, 20, matLite_02);
+            edgeMap[min][max] = edge.edgeId;
+            edges[edge.edgeId] = edge;
+            this.writeOnPos(parseInt(edge.edgeId)+"", scenes[0], edge.mid, 20, matLite_02);
+            drawLine(new THREE.Line3(edge.pa,edge.pb), scenes[0], lineDashed_01);
             return true;
         }
 
         return false;
     }
-    
 
     cloneScene(){
         scenes[1].add(this.startPoint.dot.clone());
