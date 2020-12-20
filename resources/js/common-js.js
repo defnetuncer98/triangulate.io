@@ -12,6 +12,7 @@ function hideSteps(){
     step3.style.visibility = 'hidden';
     swipeup.style.visibility = 'hidden';
     document.body.style.overflowY = 'hidden';
+    scroll(0,0);
 }
 
 function resetInfos(){
