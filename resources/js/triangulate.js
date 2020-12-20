@@ -66,7 +66,7 @@ class Triangulate extends Page{
             ready.style.visibility = 'visible';
     
         var textPos = new THREE.Vector3(input.x, input.y + 10, input.z);
-        drawText(letters[this.polygon.getPointCount()-1], textPos, scenes[0], './resources/fonts/Roboto_Regular.json', matLite);
+        drawText(letters[this.polygon.getPointCount()-1], textPos, scenes[1], './resources/fonts/Roboto_Regular.json', matLite);
     }
     
     onMouseMove(){
@@ -127,12 +127,14 @@ class Triangulate extends Page{
         scenes[1].add(this.line.line.clone());
         scenes[2].add(this.polygon.polygon.clone());
         scenes[2].add(this.line.line.clone());
+        scenes[3].add(this.polygon.polygon.clone());
+        scenes[3].add(this.line.line.clone());
     }
     
     triangulate(){
         this.findDiagonals();
     
-        this.twoColorGraph(scenes[2]);
+        this.twoColorGraph(scenes[3]);
     }
     
     findDiagonals(){
@@ -162,7 +164,7 @@ class Triangulate extends Page{
     
                 var diagonal = new THREE.Line3(startPoint, endPoint);
                 
-                drawLine(diagonal, scenes[0]);
+                drawLine(diagonal, scenes[1]);
     
                 var intersectionFound = false;
                 for(var k=0; k<this.polygon.getPointCount(); k++){
@@ -179,11 +181,11 @@ class Triangulate extends Page{
     
                 if(isConvex && isLeft(diagonal, trio.a) && isRight(diagonal, trio.c)){
                     this.diagonals.push(diagonal);
-                    drawLine(diagonal, scenes[1]);
+                    drawLine(diagonal, scenes[2]);
                 }
                 else if(!isConvex && !(isLeft(diagonal, trio.c) && isRight(diagonal, trio.a))){
                     this.diagonals.push(diagonal);
-                    drawLine(diagonal, scenes[1]);
+                    drawLine(diagonal, scenes[2]);
                 }
             }
         }
@@ -216,7 +218,7 @@ class Triangulate extends Page{
         else
             info1.innerHTML += "Orientation: Clockwise <br/>";
     
-        info1.innerHTML += "Calculation Time Complexity: O(n) <br/>";
+        info1.innerHTML += "Time Complexity: O(n) <br/>";
     
         return orientation;
     }
