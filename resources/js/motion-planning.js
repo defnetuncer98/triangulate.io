@@ -10,7 +10,6 @@ class MotionPlanning extends Page{
         this.endPoint;
         this.points = [];
         this.obstacles = [];
-        this.drawnObstacles = [];
         this.isLineActive = false;
         this.isButtonClicked = false;
         this.isStartPointSelected = false;
@@ -124,7 +123,7 @@ class MotionPlanning extends Page{
     onSelectNewLineEndPoint(){
         var newLine = new THREE.Line3(this.line.getStart(), this.line.getEnd());
         this.obstacles.push(newLine);
-        for(var i=0; i<scenes.length; i++) this.drawnObstacles.push(drawLine(newLine, scenes[i], lineBasicMaterial_04));
+        for(var i=0; i<scenes.length; i++) drawLine(newLine, scenes[i], lineBasicMaterial_04);
         ready.style.visibility = 'visible';
     }
 
@@ -380,9 +379,7 @@ class MotionPlanning extends Page{
             edgeMap[min][max] = edge.edgeId;
             edges[edge.edgeId] = edge;
             //this.writeOnPos(parseInt(edge.edgeId)+"", scenes[0], edge.mid, 20, matLite_02);
-            drawLine(new THREE.Line3(edge.pa,edge.pb), scenes[1], lineBasicMaterial_02_Transparent);
-            drawLine(new THREE.Line3(edge.pa,edge.pb), scenes[2], lineBasicMaterial_02_Transparent);
-            drawLine(new THREE.Line3(edge.pa,edge.pb), scenes[3], lineBasicMaterial_02_Transparent);
+            for(var i=1;i<scenes.length;i++) drawLine(new THREE.Line3(edge.pa,edge.pb), scenes[i], lineBasicMaterial_02_Transparent);
             return true;
         }
 
