@@ -25,8 +25,8 @@ class Triangulate extends Page{
     
     initInfo(){
         header1.innerHTML = '<i class="icon fa fa-connectdevelop"></i> triangulation';
-        header2.innerHTML = "Polygon Triangulation by Graph Coloring <br>Click anywhere to start creating polygon!";
-        step1.innerHTML = "STEP 1 | Find Orientation";
+        header2.innerHTML = "Polygon Triangulation by Graph Coloring <br> <br><font size=4em> HOW TO: <br> Click anywhere to start creating polygon!";
+        step1.innerHTML = "<br><br>STEP 1 | Find Orientation";
         step2.innerHTML = "STEP 2 | Internal Diagonals";
         step3.innerHTML = "STEP 3 | Two Coloring Graph";
     }

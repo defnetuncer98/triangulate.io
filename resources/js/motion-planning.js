@@ -29,10 +29,25 @@ class MotionPlanning extends Page{
 
     initInfo(){
         header1.innerHTML = '<i class="icon fa fa-bolt"></i> motion-planning';
-        header2.innerHTML = "Motion Planning for Point Agents on Plane with Line Segment Obstacles <br><br> <font size=4em> HOW TO: <br> Click anywhere to create line segments! <br> When you are ready, select start & end points for the agent.";
-        step1.innerHTML = "STEP 1 | Delaunay";
-        step2.innerHTML = "STEP 2 | ";
-        step3.innerHTML = "STEP 3 | ";
+        header2.innerHTML = "Motion Planning for Point Agents on Plane with Line Segment Obstacles <br><br> <font size=4em> HOW TO: <br> Click anywhere to create line segment obstacles! <br> When you are ready, select start & end points for the agent.";
+        
+        step1.innerHTML = "STEP 1 | Fat Triangulation";
+        info1.innerHTML = `<font size=4em> TASK: <br> Finding a path for the agent to move from the source point to the target point while avoiding obstacles at a safe distance.
+        <br><br>HOW TO:<br> A fat triangulation is generated using obstacles and plane's corners.
+        <br><br>ALGORITHM: <br>Delaunay
+        <br><br>TIME COMPLEXITY: <br> O( nlogn )`;
+
+        step2.innerHTML = "<br><br><br><br><br>STEP 2 | Weighted Graph";
+        info2.innerHTML = `<font size=4em> TASK: <br> Generate possible paths using the triangulation.
+        <br><br>HOW TO:<br> Possible paths are generated and saved as a weighted graph, where nodes are the midpoints of the edges of the triangulation and weights are the distance it takes to travel from an edge of an triangle to another edge.
+        <br> Source and target points are also added to the graph as nodes. Paths that are intersecting with obstacles are found and removed from the graph.
+        <br><br>GRAPH REPRESENTATION: <br> Adjacency List
+        <br><br>TIME COMPLEXITY: <br> O( n^2 )`;
+
+        step3.innerHTML = "STEP 3 | Shortest Path";
+        info3.innerHTML = `<font size=4em> TASK: <br> Given a source and a target node find the shortest path.
+        <br><br>ALGORITHM: Dijkstra
+        <br><br>TIME COMPLEXITY: <br> O( n^2 )`;
     }
     
     initLine(){
@@ -259,7 +274,8 @@ class MotionPlanning extends Page{
             var isStartInTriangle = this.isInsideTriangle(startPos, triangleVertices[0], triangleVertices[1], triangleVertices[2]);
             var isEndInTriangle = this.isInsideTriangle(endPos, triangleVertices[0], triangleVertices[1], triangleVertices[2]);
 
-            if(isStartInTriangle && isEndInTriangle) this.tryAddToWeightedMap(start,end,weightedMap);
+            //if(isStartInTriangle && isEndInTriangle)
+                this.tryAddToWeightedMap(start,end,weightedMap);
 
             for(var j=0; j<triangleEdges.length; j++){
                 var edge1 = triangleEdges[j];
