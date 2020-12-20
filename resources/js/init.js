@@ -15,6 +15,7 @@ const cursor = document.getElementById('cursor-container');
 containers.push(document.getElementById('input-canvas'));
 containers.push(document.getElementById('canvas-2'));
 containers.push(document.getElementById('canvas-3'));
+containers.push(document.getElementById('canvas-4'));
 
 const sidecontainer = document.getElementById("sidecontainer");
 
@@ -46,7 +47,7 @@ const cursorInfo = document.getElementById("cursor-info");
 const colorPalette_01 = 0xffffff;
 const colorPalette_02 = 0x6495ED;
 const colorPalette_03 = 0x7FFF00;
-const colorPalette_04 = 0xFF0000;
+const colorPalette_04 = 0x00FFFF;
 
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -54,11 +55,10 @@ const lineBasicMaterial_01 = new THREE.LineBasicMaterial( { color: colorPalette_
 const lineBasicMaterial_04 = new THREE.LineBasicMaterial( { color: colorPalette_01, transparent: true, linewidth: 20} );
 
 const lineBasicMaterial_02 = new THREE.LineBasicMaterial( { color: colorPalette_02 } );
-const lineDashed_01 = new THREE.LineDashedMaterial( { color: colorPalette_02, dashSize: 10, gapSize: 10, opacity: 0.1 });
-const lineDashed_02 = new THREE.LineDashedMaterial( { color: colorPalette_02, scale: 1, dashSize: 3, gapSize: 1 });
+const lineBasicMaterial_02_Transparent = new THREE.LineBasicMaterial( { color: colorPalette_02, transparent: true, opacity : 0.3 });
 
 const lineBasicMaterial_03 = new THREE.LineBasicMaterial( { color: colorPalette_03 } );
-const lineBasicMaterial_05 = new THREE.LineBasicMaterial( { color: colorPalette_03 } );
+const lineBasicMaterial_03_Transparent = new THREE.LineBasicMaterial( { color: colorPalette_03, transparent: true, opacity : 0.3 });
 
 const lineBasicMaterial_06 = new THREE.LineBasicMaterial( { color: colorPalette_04 } );
 
@@ -73,7 +73,7 @@ init();
 animate();
 
 function init(){
-    initCanvas(3);
+    initCanvas(4);
     initCamera();
 }
 

@@ -29,7 +29,7 @@ class MotionPlanning extends Page{
 
     initInfo(){
         header1.innerHTML = '<i class="icon fa fa-bolt"></i> motion-planning';
-        header2.innerHTML = "Motion Planning for Point Agents on Plane with Line Segment Obstacles <br> Click anywhere to create line segments!";
+        header2.innerHTML = "Motion Planning for Point Agents on Plane with Line Segment Obstacles <br><br> <font size=4em> HOW TO: <br> Click anywhere to create line segments! <br> When you are ready, select start & end points for the agent.";
         step1.innerHTML = "STEP 1 | Delaunay";
         step2.innerHTML = "STEP 2 | ";
         step3.innerHTML = "STEP 3 | ";
@@ -42,10 +42,10 @@ class MotionPlanning extends Page{
 
     initPoints(){
         this.startPoint = new Point(new THREE.Vector3(0,0,0));
-        scenes[0].add(this.startPoint.dot);
+        for(var i=0; i<scenes.length; i++) scenes[i].add(this.startPoint.dot.clone());
 
         this.endPoint = new Point(new THREE.Vector3(0,0,0));
-        scenes[0].add(this.endPoint.dot);
+        for(var i=0; i<scenes.length; i++) scenes[i].add(this.endPoint.dot.clone());
 
         this.addPoint(window.innerWidth/2.1, window.innerHeight/2.1, 0, -20);
         this.addPoint(-window.innerWidth/11, window.innerHeight/2.1, 0, -20);
@@ -58,7 +58,7 @@ class MotionPlanning extends Page{
 
         this.points.push(pos);
 
-        this.writeOnPos(parseInt(this.points.length-1)+"", scenes[0], pos, offset);
+        //this.writeOnPos(parseInt(this.points.length-1)+"", scenes[0], pos, offset);
     }
 
     updateStartPoint(point){
@@ -109,7 +109,7 @@ class MotionPlanning extends Page{
     onSelectNewLineEndPoint(){
         var newLine = new THREE.Line3(this.line.getStart(), this.line.getEnd());
         this.obstacles.push(newLine);
-        this.drawnObstacles.push(drawLine(newLine, scenes[0], lineBasicMaterial_04));
+        for(var i=0; i<scenes.length; i++) this.drawnObstacles.push(drawLine(newLine, scenes[i], lineBasicMaterial_04));
         ready.style.visibility = 'visible';
     }
 
@@ -120,14 +120,14 @@ class MotionPlanning extends Page{
     onSelectStartPoint(){
         this.updateStartPoint(input);
         setCursorInfo('Select end point');
-        this.writeOnPos('start point', scenes[0]);
+        for(var i=0; i<scenes.length; i++) this.writeOnPos('start', scenes[i]);
     }
 
     onSelectEndPoint(){
         this.updateEndPoint(input);
         this.startPlanningMotion();
         setCursorInfo('');
-        this.writeOnPos('end point', scenes[0]);
+        for(var i=0; i<scenes.length; i++) this.writeOnPos('end', scenes[i]);
         this.endPointSelected = true;
     }
     
@@ -182,8 +182,6 @@ class MotionPlanning extends Page{
     startPlanningMotion(){
         showSteps();
 
-        this.cloneScene();
-
         reset.style.visibility = 'visible';
 
         this.line.setInvisible();
@@ -197,9 +195,6 @@ class MotionPlanning extends Page{
 
         var triangles = Delaunay.triangulate(vertices);
 
-        //for(var i=0; i<this.drawnObstacles.length; i++)
-            //scenes[0].remove(this.drawnObstacles[i]);
-        
         this.createGraph(triangles);
     }
 
@@ -291,7 +286,7 @@ class MotionPlanning extends Page{
         var shortestPath = this.graph.findShortestPath(start.edgeId, end.edgeId);
 
         for(var i=0; i<shortestPath.length-1; i++)
-            drawLine(new THREE.Line3(edges[shortestPath[i]].mid, edges[shortestPath[i+1]].mid), scenes[0], lineBasicMaterial_06);
+            drawLine(new THREE.Line3(edges[shortestPath[i]].mid, edges[shortestPath[i+1]].mid), scenes[3], lineBasicMaterial_06);
     }
 
     edgeIsObstacle(edge){
@@ -335,7 +330,8 @@ class MotionPlanning extends Page{
         if(this.isIllegalPath(edge1.mid,edge2.mid))
             return;
         
-        //drawLine(new THREE.Line3(edge1.mid,edge2.mid), scenes[0], lineDashed_02);
+        drawLine(new THREE.Line3(edge1.mid,edge2.mid), scenes[2], lineBasicMaterial_03);
+        drawLine(new THREE.Line3(edge1.mid,edge2.mid), scenes[3], lineBasicMaterial_03_Transparent);
 
         var dist = edge1.mid.distanceTo(edge2.mid);
         
@@ -367,20 +363,14 @@ class MotionPlanning extends Page{
         if(!(max in edgeMap[min])){
             edgeMap[min][max] = edge.edgeId;
             edges[edge.edgeId] = edge;
-            this.writeOnPos(parseInt(edge.edgeId)+"", scenes[0], edge.mid, 20, matLite_02);
-            drawLine(new THREE.Line3(edge.pa,edge.pb), scenes[0], lineDashed_01);
+            //this.writeOnPos(parseInt(edge.edgeId)+"", scenes[0], edge.mid, 20, matLite_02);
+            drawLine(new THREE.Line3(edge.pa,edge.pb), scenes[1], lineBasicMaterial_02_Transparent);
+            drawLine(new THREE.Line3(edge.pa,edge.pb), scenes[2], lineBasicMaterial_02_Transparent);
+            drawLine(new THREE.Line3(edge.pa,edge.pb), scenes[3], lineBasicMaterial_02_Transparent);
             return true;
         }
 
         return false;
-    }
-
-    cloneScene(){
-        scenes[1].add(this.startPoint.dot.clone());
-        scenes[1].add(this.endPoint.dot.clone());
-
-        scenes[2].add(this.startPoint.dot.clone());
-        scenes[2].add(this.endPoint.dot.clone());
     }
 
 }
