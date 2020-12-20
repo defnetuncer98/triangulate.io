@@ -1,4 +1,4 @@
-var currentPageIndex = 2;
+var currentPageIndex = 0;
 
 var pages = [];
 
