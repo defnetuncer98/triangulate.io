@@ -16,6 +16,7 @@ containers.push(document.getElementById('input-canvas'));
 containers.push(document.getElementById('canvas-2'));
 containers.push(document.getElementById('canvas-3'));
 containers.push(document.getElementById('canvas-4'));
+containers.push(document.getElementById('canvas-5'));
 
 const sidecontainer = document.getElementById("sidecontainer");
 
@@ -73,7 +74,7 @@ init();
 animate();
 
 function init(){
-    initCanvas(4);
+    initCanvas(5);
     initCamera();
 }
 

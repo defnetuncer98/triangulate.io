@@ -301,7 +301,7 @@ class MotionPlanning extends Page{
         var shortestPath = this.graph.findShortestPath(start.edgeId, end.edgeId);
 
         for(var i=0; i<shortestPath.length-1; i++)
-            drawLine(new THREE.Line3(edges[shortestPath[i]].mid, edges[shortestPath[i+1]].mid), scenes[3], lineBasicMaterial_06);
+            for(var j=3; j<5; j++) drawLine(new THREE.Line3(edges[shortestPath[i]].mid, edges[shortestPath[i+1]].mid), scenes[j], lineBasicMaterial_06);
     }
 
     edgeIsObstacle(edge){
@@ -379,7 +379,7 @@ class MotionPlanning extends Page{
             edgeMap[min][max] = edge.edgeId;
             edges[edge.edgeId] = edge;
             //this.writeOnPos(parseInt(edge.edgeId)+"", scenes[0], edge.mid, 20, matLite_02);
-            for(var i=1;i<scenes.length;i++) drawLine(new THREE.Line3(edge.pa,edge.pb), scenes[i], lineBasicMaterial_02_Transparent);
+            for(var i=1;i<scenes.length-2;i++) drawLine(new THREE.Line3(edge.pa,edge.pb), scenes[i], lineBasicMaterial_02_Transparent);
             return true;
         }
 
