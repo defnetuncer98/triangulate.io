@@ -1,4 +1,4 @@
-var currentPageIndex = 0;
+var currentPageIndex = 3;
 
 var pages = [];
 
@@ -14,6 +14,7 @@ function initPages(){
     pages.push(new Home());
     pages.push(new Triangulate());
     pages.push(new MotionPlanning());
+    pages.push(new WindingNumber());
 }
 
 function getInputOnScreen( event ){
