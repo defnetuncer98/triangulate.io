@@ -127,7 +127,10 @@ class Polygon {
     raycast(line, multiplier = 10, debug = false){
         var endPoint = line.end.clone();
 
-        endPoint.multiplyScalar(multiplier);
+        var dir = new THREE.Vector3();
+        dir.subVectors(line.end, line.start);
+
+        endPoint.addScaledVector(dir, multiplier);
 
         var ray = new THREE.Line3(line.start, endPoint);
 
