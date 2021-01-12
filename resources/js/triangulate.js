@@ -145,13 +145,6 @@ class Triangulate extends Page{
         for(var i=0; i<this.polygon.getPointCount(); i++){
             var startIndex = i*3;
             var startPoint = this.polygon.getPoint(startIndex);
-            var trio = this.polygon.getTrio(startIndex);
-            var angle = findAngle(trio, orientation);
-
-            var isConvex = angle<180;
-
-            var textPos = new THREE.Vector3(trio.b.x, trio.b.y - 20, trio.b.z);
-            drawText(parseInt(angle)+"", textPos, scenes[1]);
 
             var trio = this.polygon.getTrio(startIndex, orientation);
     
@@ -166,24 +159,10 @@ class Triangulate extends Page{
                 
                 drawLine(diagonal, scenes[1]);
     
-                var intersectionFound = false;
-                for(var k=0; k<this.polygon.getPointCount(); k++){
-                    var trio2 = this.polygon.getTrio(k*3, true);
-    
-                    if(isIntersecting(diagonal, new THREE.Line3(trio2.b, trio2.c))){
-                        intersectionFound = true;
-                        break;
-                    }
-                }
-    
-                if(intersectionFound)
+                if(this.polygon.isIntersecting(diagonal))
                     continue;
-    
-                if(isConvex && isLeft(diagonal, trio.a) && isRight(diagonal, trio.c)){
-                    this.diagonals.push(diagonal);
-                    drawLine(diagonal, scenes[2]);
-                }
-                else if(!isConvex && !(isLeft(diagonal, trio.c) && isRight(diagonal, trio.a))){
+
+                if(this.polygon.isInCone(startIndex, diagonal)){
                     this.diagonals.push(diagonal);
                     drawLine(diagonal, scenes[2]);
                 }

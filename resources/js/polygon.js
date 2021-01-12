@@ -4,6 +4,7 @@ class Polygon {
         this.polygon = createLineGeometry(500);
         this.polygon.geometry.setDrawRange( 0, 0 );
         this.polygonPoints = this.polygon.geometry.attributes.position.array;
+        this.orientation = null;
     }
 
     getConvexHullIndex(){
@@ -27,7 +28,10 @@ class Polygon {
     }
 
     getOrientation(){
-        return findDeterminant(this.getTrio(this.getConvexHullIndex()));
+        if(this.orientation == null)
+            this.orientation = findDeterminant(this.getTrio(this.getConvexHullIndex()));
+            
+        return this.orientation;
     }
 
     getPoint(index){
@@ -80,6 +84,39 @@ class Polygon {
 
         this.polygon.geometry.setDrawRange( 0, this.getPointCount() );
         this.polygon.geometry.attributes.position.needsUpdate = true;
+    }
+
+    isInCone(index, line){
+        var trio = this.getTrio(index);
+
+        var angle = findAngle(trio, this.getOrientation());
+
+        var isConvex = angle<180;
+
+        var trio = this.getTrio(index, this.getOrientation());
+
+        if(isConvex && isLeft(line, trio.a) && isRight(line, trio.c)){
+            return true;
+        }
+        else if(!isConvex && !(isLeft(line, trio.c) && isRight(line, trio.a))){
+            return true;
+        }
+
+        return false;
+    }
+
+    isIntersecting(line){
+        var intersectionFound = false;
+        for(var k=0; k<this.getPointCount(); k++){
+            var trio2 = this.getTrio(k*3, true);
+
+            if(isIntersecting(line, new THREE.Line3(trio2.b, trio2.c))){
+                intersectionFound = true;
+                break;
+            }
+        }
+
+        return intersectionFound;
     }
 }
 

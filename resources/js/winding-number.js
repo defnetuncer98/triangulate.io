@@ -51,7 +51,7 @@ class WindingNumber extends Page{
 
         this.triangulate.cloneScene();
 
-        this.windNumber();
+        this.createLightPolygon();
     }
 
     onClickedResetButton(){
@@ -64,6 +64,11 @@ class WindingNumber extends Page{
     
     onLeftResetButton(){
         this.triangulate.onLeftResetButton();
+    }
+
+    createLightPolygon(){
+        
+
     }
 
     windNumber(){
@@ -91,7 +96,7 @@ class WindingNumber extends Page{
                 var point = dir.clone();
                 point.multiplyScalar(i * intervalDistance).add(start);
 
-                var encapsulated = this.isEncapsulated(polygon, endIndex);
+                var encapsulated = this.isEncapsulated(point, polygon, endIndex);
 
                 var dot;
                 
@@ -100,26 +105,48 @@ class WindingNumber extends Page{
 
                 dot.dot.geometry.setDrawRange(0,1);
                 for(var j=1; j<scenes.length; j++) scenes[j].add(dot.dot.clone());
+
             }
 
+            break;
             startIndex = endIndex;
             endIndex = polygon.getNextIndex(startIndex);
 
         } while(startIndex != convexHullIndex) // orientation?
     }
 
-    isEncapsulated(polygon, index){
+    isEncapsulated(point, polygon, index){
         var temp = index;
 
         do{
-            var point = polygon.getPoint(temp);
+            var corner = polygon.getPoint(temp);
 
-
+            var angle = this.findAngle(point, corner);
 
             temp = polygon.getNextIndex(temp);
         } while(temp != index)
 
-
         return false;
+    }
+
+    findAngle(point, corner){
+
+        if(isSamePoint(point, corner))
+            return 0;
+
+        var up = new THREE.Vector3(point.x, point.y + 10, point.z);
+
+        var dir1 = new THREE.Vector3();
+        dir1.subVectors( up, point ).normalize();
+
+        var dir2 = new THREE.Vector3();
+        dir2.subVectors( corner, point ).normalize();
+
+        var angle = THREE.MathUtils.radToDeg(dir1.angleTo(dir2));
+
+        if(isLeft(new THREE.Line3(point, up), corner))
+            angle *= -1;
+
+        return angle;
     }
 }
