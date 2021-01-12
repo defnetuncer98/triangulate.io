@@ -110,14 +110,27 @@ class Polygon {
         return false;
     }
 
-    isIntersecting(line){
+    isIntersecting(line, hit = new THREE.Line3(), intersection=new THREE.Vector3()){
         var intersectionFound = false;
+        var distance = 0;
         for(var k=0; k<this.getPointCount(); k++){
             var trio2 = this.getTrio(k*3, true);
 
-            if(isIntersecting(line, new THREE.Line3(trio2.b, trio2.c))){
+            var line2 = new THREE.Line3(trio2.b, trio2.c);
+
+            if(isIntersecting(line, line2)){
+                var temp = getIntersection(line, line2);
+
+                if(!intersectionFound || distance > temp.distanceTo(line.start) || isSamePoint(intersection, trio2.b) || isSamePoint(intersection, trio2.c)){
+                    hit.start = trio2.b;
+                    hit.end = trio2.c;
+                    intersection.x = temp.x;
+                    intersection.y = temp.y;
+                    intersection.z = temp.z;
+                    distance = intersection.distanceTo(line.start);
+                }
+
                 intersectionFound = true;
-                break;
             }
         }
 
@@ -134,7 +147,7 @@ class Polygon {
 
         var ray = new THREE.Line3(line.start.clone(), endPoint);
 
-        if(debug) drawLine(ray, scenes[1], lineBasicMaterial_03);
+        if(debug) drawLine(ray, scenes[2], lineBasicMaterial_03);
 
         return this.isIntersecting(ray);
     }

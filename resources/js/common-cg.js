@@ -43,3 +43,28 @@ function findAngle(trio, orientation){
 
     return angle;
 }
+
+function getIntersection(line1, line2)
+{ 
+    var A = line1.start;
+    var B = line1.end;
+    var C = line2.start;
+    var D = line2.end;
+
+    // Line AB represented as a1x + b1y = c1 
+    var a1 = B.y - A.y; 
+    var b1 = A.x - B.x; 
+    var c1 = a1*(A.x) + b1*(A.y); 
+
+    // Line CD represented as a2x + b2y = c2 
+    var a2 = D.y - C.y; 
+    var b2 = C.x - D.x; 
+    var c2 = a2*(C.x)+ b2*(C.y); 
+
+    var determinant = a1*b2 - a2*b1; 
+
+    var x = (b2*c1 - b1*c2)/determinant; 
+    var y = (a1*c2 - a2*c1)/determinant; 
+
+    return new THREE.Vector3(x, y); 
+}

@@ -79,17 +79,40 @@ class WindingNumber extends Page{
                 var endIndex = j*3;
                 var endPoint = polygon.getPoint(endIndex);
 
-                var line = new THREE.Line3(startPoint, endPoint);
-                var line2 = new THREE.Line3(endPoint, startPoint);
+                var line = new THREE.Line3(startPoint.clone(), endPoint.clone());
+                var line2 = new THREE.Line3(endPoint.clone(), startPoint.clone());
 
                 if(polygon.isInCone(startIndex, line, false) || polygon.isInCone(endIndex, line2, false))
                     continue;
 
+                console.log(j);
                 if(polygon.raycast(line, 3, true))
                     continue;
+                console.log("hi");
 
                 light = true;
+
+                var dir = new THREE.Vector3();
+                dir.subVectors(startPoint, endPoint);
+    
+                var startPoint2 = startPoint.clone();
+                startPoint2.addScaledVector(dir, 3);
+
+                var line3 = new THREE.Line3(startPoint, startPoint2);
+                drawLine(line3, scenes[1], lineBasicMaterial_03);
+
+                var intersection = new THREE.Vector3();
+                var hit = new THREE.Line3();
+                if(polygon.isIntersecting(line3, hit, intersection)){
+                    
+                    var dot = new Point(intersection.clone(), dotMaterial_02);
+        
+                    dot.dot.geometry.setDrawRange(0,1);
+                    for(var k=1; k<scenes.length; k++) scenes[k].add(dot.dot.clone());
+                }
+
             }
+            console.log("hmm");
 
             var dot;
             if(light) dot = new Point(startPoint.clone(), dotMaterial_02);
