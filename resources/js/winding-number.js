@@ -82,13 +82,10 @@ class WindingNumber extends Page{
                 var line = new THREE.Line3(startPoint, endPoint);
                 var line2 = new THREE.Line3(endPoint, startPoint);
 
-                if(polygon.isInCone(startIndex, line, false) || polygon.isInCone(endIndex, line, false))
+                if(polygon.isInCone(startIndex, line, false) || polygon.isInCone(endIndex, line2, false))
                     continue;
 
-                if(polygon.isInCone(startIndex, line2, false) || polygon.isInCone(endIndex, line2, false))
-                    continue;
-
-                if(polygon.raycast(line, 10, true))
+                if(polygon.raycast(line, 3, true))
                     continue;
 
                 light = true;

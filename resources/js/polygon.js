@@ -124,7 +124,7 @@ class Polygon {
         return intersectionFound;
     }
 
-    raycast(line, multiplier = 10, debug = false){
+    raycast(line, multiplier = 3, debug = false){
         var endPoint = line.end.clone();
 
         var dir = new THREE.Vector3();
@@ -132,7 +132,7 @@ class Polygon {
 
         endPoint.addScaledVector(dir, multiplier);
 
-        var ray = new THREE.Line3(line.start, endPoint);
+        var ray = new THREE.Line3(line.start.clone(), endPoint);
 
         if(debug) drawLine(ray, scenes[1], lineBasicMaterial_03);
 
