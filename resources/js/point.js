@@ -1,7 +1,7 @@
 class Point{
-    constructor(point){
+    constructor(point, mat = dotMaterial){
         this.point = point;
-        this.dot = createPointGeometry(point);
+        this.dot = createPointGeometry(point, mat);
         this.dotPoints = this.dot.geometry.attributes.position.array;
         this.dot.geometry.setDrawRange( 0, 0 );
     }
