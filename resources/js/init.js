@@ -49,6 +49,7 @@ const colorPalette_01 = 0xffffff;
 const colorPalette_02 = 0x6495ED;
 const colorPalette_03 = 0x7FFF00;
 const colorPalette_04 = 0x00FFFF;
+const colorPalette_05 = 0xFF0000;
 
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -69,6 +70,7 @@ const matLite_03 = new THREE.MeshBasicMaterial( { color: colorPalette_03, transp
 
 const dotMaterial = new THREE.PointsMaterial( { size: 5, sizeAttenuation: false, color: colorPalette_01 } );
 const dotMaterial_02 = new THREE.PointsMaterial( { size: 3, sizeAttenuation: false, color: colorPalette_03 } );
+const dotMaterial_03 = new THREE.PointsMaterial( { size: 3, sizeAttenuation: false, color: colorPalette_05 } );
 
 
 init();

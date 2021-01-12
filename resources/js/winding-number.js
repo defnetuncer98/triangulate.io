@@ -91,15 +91,35 @@ class WindingNumber extends Page{
                 var point = dir.clone();
                 point.multiplyScalar(i * intervalDistance).add(start);
 
-                var dot = new Point(point.clone(), dotMaterial_02);
+                var encapsulated = this.isEncapsulated(polygon, endIndex);
+
+                var dot;
+                
+                if(encapsulated) dot = new Point(point.clone(), dotMaterial_03);
+                else dot = new Point(point.clone(), dotMaterial_02);
+
                 dot.dot.geometry.setDrawRange(0,1);
                 for(var j=1; j<scenes.length; j++) scenes[j].add(dot.dot.clone());
-                
             }
 
             startIndex = endIndex;
             endIndex = polygon.getNextIndex(startIndex);
-        }
-        while(startIndex != convexHullIndex) // orientation?
+
+        } while(startIndex != convexHullIndex) // orientation?
+    }
+
+    isEncapsulated(polygon, index){
+        var temp = index;
+
+        do{
+            var point = polygon.getPoint(temp);
+
+
+
+            temp = polygon.getNextIndex(temp);
+        } while(temp != index)
+
+
+        return false;
     }
 }
