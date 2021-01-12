@@ -67,8 +67,40 @@ class WindingNumber extends Page{
     }
 
     createLightPolygon(){
-        
+        var polygon = this.triangulate.polygon;
+        for(var i=0; i<polygon.getPointCount(); i++){
+            var startIndex = i*3;
+            var startPoint = polygon.getPoint(startIndex);
 
+            var light = false;
+
+            for(var j=0; j<polygon.getPointCount(); j++){
+                if(j==i) continue;
+                var endIndex = j*3;
+                var endPoint = polygon.getPoint(endIndex);
+
+                var line = new THREE.Line3(startPoint, endPoint);
+                var line2 = new THREE.Line3(endPoint, startPoint);
+
+                if(polygon.isInCone(startIndex, line, false) || polygon.isInCone(endIndex, line, false))
+                    continue;
+
+                if(polygon.isInCone(startIndex, line2, false) || polygon.isInCone(endIndex, line2, false))
+                    continue;
+
+                if(polygon.raycast(line, 10, true))
+                    continue;
+
+                light = true;
+            }
+
+            var dot;
+            if(light) dot = new Point(startPoint.clone(), dotMaterial_02);
+            else dot = new Point(startPoint.clone(), dotMaterial_03);
+
+            dot.dot.geometry.setDrawRange(0,1);
+            for(var j=1; j<scenes.length; j++) scenes[j].add(dot.dot.clone());
+        }
     }
 
     windNumber(){

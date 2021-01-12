@@ -86,7 +86,7 @@ class Polygon {
         this.polygon.geometry.attributes.position.needsUpdate = true;
     }
 
-    isInCone(index, line){
+    isInCone(index, line, isInclusive = true){
         var trio = this.getTrio(index);
 
         var angle = findAngle(trio, this.getOrientation());
@@ -94,6 +94,11 @@ class Polygon {
         var isConvex = angle<180;
 
         var trio = this.getTrio(index, this.getOrientation());
+
+        if(!isInclusive){
+            if(isSameLine(line.start, line.end, trio.b, trio.c) || isSameLine(line.start, line.end, trio.b, trio.a))
+                return false;
+        }
 
         if(isConvex && isLeft(line, trio.a) && isRight(line, trio.c)){
             return true;
@@ -117,6 +122,18 @@ class Polygon {
         }
 
         return intersectionFound;
+    }
+
+    raycast(line, multiplier = 10, debug = false){
+        var endPoint = line.end.clone();
+
+        endPoint.multiplyScalar(multiplier);
+
+        var ray = new THREE.Line3(line.start, endPoint);
+
+        if(debug) drawLine(ray, scenes[1], lineBasicMaterial_03);
+
+        return this.isIntersecting(ray);
     }
 }
 

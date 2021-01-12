@@ -69,8 +69,8 @@ const matLite_02 = new THREE.MeshBasicMaterial( { color: colorPalette_02, transp
 const matLite_03 = new THREE.MeshBasicMaterial( { color: colorPalette_03, transparent: true, opacity: 0.4, side: THREE.DoubleSide } );
 
 const dotMaterial = new THREE.PointsMaterial( { size: 5, sizeAttenuation: false, color: colorPalette_01 } );
-const dotMaterial_02 = new THREE.PointsMaterial( { size: 3, sizeAttenuation: false, color: colorPalette_03 } );
-const dotMaterial_03 = new THREE.PointsMaterial( { size: 3, sizeAttenuation: false, color: colorPalette_05 } );
+const dotMaterial_02 = new THREE.PointsMaterial( { size: 10, sizeAttenuation: false, color: colorPalette_03 } );
+const dotMaterial_03 = new THREE.PointsMaterial( { size: 10, sizeAttenuation: false, color: colorPalette_05 } );
 
 
 init();

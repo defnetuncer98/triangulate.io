@@ -66,7 +66,8 @@ class Triangulate extends Page{
             ready.style.visibility = 'visible';
     
         var textPos = new THREE.Vector3(input.x, input.y + 10, input.z);
-        drawText(letters[this.polygon.getPointCount()-1], textPos, scenes[1], './resources/fonts/Roboto_Regular.json', matLite);
+        if(currentPageIndex == 1)
+            drawText(letters[this.polygon.getPointCount()-1], textPos, scenes[1], './resources/fonts/Roboto_Regular.json', matLite);
     }
     
     onMouseMove(){
