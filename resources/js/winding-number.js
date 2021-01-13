@@ -85,10 +85,8 @@ class WindingNumber extends Page{
                 if(polygon.isInCone(startIndex, line, false) || polygon.isInCone(endIndex, line2, false))
                     continue;
 
-                console.log(j);
-                if(polygon.raycast(line, 3, true))
+                if(polygon.raycast(line, 5, false))
                     continue;
-                console.log("hi");
 
                 light = true;
 
@@ -96,9 +94,13 @@ class WindingNumber extends Page{
                 dir.subVectors(startPoint, endPoint);
     
                 var startPoint2 = startPoint.clone();
-                startPoint2.addScaledVector(dir, 3);
+                startPoint2.addScaledVector(dir, 5);
 
                 var line3 = new THREE.Line3(startPoint, startPoint2);
+
+                if(polygon.isInCone(startIndex, line3, false))
+                    continue;
+                                    
                 drawLine(line3, scenes[1], lineBasicMaterial_03);
 
                 var intersection = new THREE.Vector3();
@@ -112,7 +114,6 @@ class WindingNumber extends Page{
                 }
 
             }
-            console.log("hmm");
 
             var dot;
             if(light) dot = new Point(startPoint.clone(), dotMaterial_02);

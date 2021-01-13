@@ -114,14 +114,18 @@ class Polygon {
         var intersectionFound = false;
         var distance = 0;
         for(var k=0; k<this.getPointCount(); k++){
-            var trio2 = this.getTrio(k*3, true);
+            var trio2 = this.getTrio(k*3, this.getOrientation());
 
             var line2 = new THREE.Line3(trio2.b, trio2.c);
 
             if(isIntersecting(line, line2)){
                 var temp = getIntersection(line, line2);
 
-                if(!intersectionFound || distance > temp.distanceTo(line.start) || isSamePoint(intersection, trio2.b) || isSamePoint(intersection, trio2.c)){
+                if(isSamePoint(temp, trio2.b) || isSamePoint(temp, trio2.c))
+                    continue;
+
+
+                if(!intersectionFound || distance > temp.distanceTo(line.start)){
                     hit.start = trio2.b;
                     hit.end = trio2.c;
                     intersection.x = temp.x;
@@ -147,9 +151,16 @@ class Polygon {
 
         var ray = new THREE.Line3(line.start.clone(), endPoint);
 
-        if(debug) drawLine(ray, scenes[2], lineBasicMaterial_03);
+        var out = this.isIntersecting(ray);
 
-        return this.isIntersecting(ray);
+        if(debug) {
+            if(out)
+                drawLine(ray, scenes[2], lineBasicMaterial_02_Transparent);
+            else
+                drawLine(ray, scenes[3], lineBasicMaterial_02_Transparent);
+        }
+
+        return out;
     }
 }
 
