@@ -98,6 +98,8 @@ class WindingNumber extends Page{
 
                 light = true;
 
+                //drawLine(new THREE.Line3(startPoint, endPoint), scenes[1], lineBasicMaterial_03);
+
                 var dir = new THREE.Vector3();
                 dir.subVectors(startPoint, endPoint);
     
@@ -179,15 +181,33 @@ class WindingNumber extends Page{
                     }
                 }
 
-                this.polygon.addPoint(lightMap[i][min]);
-                shape.lineTo(lightMap[i][min].x, lightMap[i][min].y);
-
+                var minPoint = lightMap[i][min];
+                var maxPoint = lightMap[i][max];
+                
+                this.polygon.addPoint(minPoint);
+                shape.lineTo(minPoint.x, minPoint.y);
 
                 if(min != max) {
-                    this.polygon.addPoint(lightMap[i][max]);
-                    shape.lineTo(lightMap[i][max].x, lightMap[i][max].y);
+                    this.polygon.addPoint(maxPoint);
+                    shape.lineTo(maxPoint.x, maxPoint.y);
                 }
 
+                if(!vertexMap[polygon.getNextIndex(index)/3]){
+                    for(var k=2; k<3; k++) drawLine(new THREE.Line3(maxPoint, polygon.getPoint(polygon.getNextIndex(index))), scenes[k], lineBasicMaterial_07);
+                }
+
+                if(!vertexMap[i]){
+                    for(var k=2; k<3; k++) drawLine(new THREE.Line3(minPoint, point), scenes[k], lineBasicMaterial_07);
+                }
+            }
+            else{
+                if(!vertexMap[polygon.getNextIndex(index)/3]){
+                    for(var k=2; k<3; k++) drawLine(new THREE.Line3(point, polygon.getPoint(polygon.getNextIndex(index))), scenes[k], lineBasicMaterial_07);
+                }
+                
+                if(!vertexMap[polygon.getPreviousIndex(index)/3]){
+                    for(var k=2; k<3; k++) drawLine(new THREE.Line3(point, polygon.getPoint(polygon.getPreviousIndex(index))), scenes[k], lineBasicMaterial_07);
+                }
             }
         }
 

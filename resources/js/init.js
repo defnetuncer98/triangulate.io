@@ -64,6 +64,8 @@ const lineBasicMaterial_03_Transparent = new THREE.LineBasicMaterial( { color: c
 
 const lineBasicMaterial_06 = new THREE.LineBasicMaterial( { color: colorPalette_04 } );
 
+const lineBasicMaterial_07 = new THREE.LineBasicMaterial( { color: colorPalette_05 } );
+
 const matLite = new THREE.MeshBasicMaterial( { color: colorPalette_01, transparent: true, opacity: 0.4, side: THREE.DoubleSide } );
 const matLite_02 = new THREE.MeshBasicMaterial( { color: colorPalette_02, transparent: true, opacity: 0.4, side: THREE.DoubleSide } );
 const matLite_03 = new THREE.MeshBasicMaterial( { color: colorPalette_03, transparent: true, opacity: 0.4, side: THREE.DoubleSide } );
