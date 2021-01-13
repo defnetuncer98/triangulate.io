@@ -110,8 +110,9 @@ class Polygon {
         return false;
     }
 
-    isIntersecting(line, hit = [], intersection=new THREE.Vector3()){
+    isIntersecting(line, hit = [], intersection=new THREE.Vector3(), hitCount = []){
         hit.push(0);
+        hitCount.push(0);
         var intersectionFound = false;
         var distance = 0;
         for(var k=0; k<this.getPointCount(); k++){
@@ -125,6 +126,7 @@ class Polygon {
                 if(isSamePoint(temp, trio2.b) || isSamePoint(temp, trio2.c))
                     continue;
 
+                hitCount[0] = hitCount[0]+1;
 
                 if(!intersectionFound || distance > temp.distanceTo(line.start)){
                     hit[0] = k;
@@ -141,7 +143,7 @@ class Polygon {
         return intersectionFound;
     }
 
-    raycast(line, multiplier = 3, debug = false){
+    raycast(line, multiplier = 3, debug = false, hitCount = []){
         var endPoint = line.end.clone();
 
         var dir = new THREE.Vector3();
@@ -151,16 +153,31 @@ class Polygon {
 
         var ray = new THREE.Line3(line.start.clone(), endPoint);
 
-        var out = this.isIntersecting(ray);
+        var hit = [];
+        var intersection = new THREE.Vector3();
+        var out = this.isIntersecting(ray, hit, intersection, hitCount);
 
         if(debug) {
             if(out)
-                drawLine(ray, scenes[2], lineBasicMaterial_02_Transparent);
+                drawDashedLine(ray, scenes[4], 5, lineBasicMaterial_02_Transparent);
             else
-                drawLine(ray, scenes[3], lineBasicMaterial_02_Transparent);
+                drawDashedLine(ray, scenes[4], 5, lineBasicMaterial_02_Transparent);
         }
 
         return out;
+    }
+
+    isInside(input){
+        console.log(input);
+        var up = new THREE.Vector3(input.x, input.y+100, input.z);
+        
+        var hitCount = [];
+
+        this.raycast(new THREE.Line3(input, up), 10, true, hitCount);
+
+        console.log(hitCount[0]);
+
+        return hitCount[0] % 2 != 0;
     }
 }
 

@@ -20,15 +20,33 @@ class WindingNumber extends Page{
     }
 
     initInfo(){
-        header1.innerHTML = '<i class="icon fa fa-cube"></i> winding-number';
+        header1.innerHTML = '<i class="icon fa fa-cube"></i> 2d-shadow';
         header2.innerHTML = "<font size=4em> HOW TO: <br> Click anywhere to start creating polygon!";
-        step1.innerHTML = "<br><br>STEP 1 | Find Orientation";
-        step2.innerHTML = "STEP 2 | Internal Diagonals";
-        step3.innerHTML = "STEP 3 | Two Coloring Graph";
+        step1.innerHTML = "<br>STEP 1 | Fat Triangulation";
+        info1.innerHTML = `<font size=4em> TASK: <br> Finding a path for the agent to move from the source point to the target point while avoiding obstacles at a safe distance.
+        <br><br>HOW TO:<br> A fat triangulation is generated using obstacles and plane's corners.
+        <br><br>ALGORITHM: <br>Delaunay
+        <br><br>TIME COMPLEXITY: <br> O( nlogn )`;
+
+        step2.innerHTML = "<br><br><br><br><br>STEP 2 | Weighted Graph";
+        info2.innerHTML = `<font size=4em> TASK: <br> Generate possible paths using the triangulation.
+        <br><br>HOW TO:<br> Possible paths are generated and saved as a weighted graph, where nodes are the midpoints of the edges of the triangulation and weights are the distance it takes to travel from an edge of an triangle to another edge.
+        <br> Source and target points are also added to the graph as nodes. Paths that are intersecting with obstacles are found and removed from the graph.
+        <br><br>GRAPH REPRESENTATION: <br> Adjacency List
+        <br><br>TIME COMPLEXITY: <br> O( n^2 )`;
+
+        step3.innerHTML = "STEP 3 | Shortest Path";
+        info3.innerHTML = `<font size=4em> TASK: <br> Given a source and a target node find the shortest path.
+        <br><br>ALGORITHM: Dijkstra
+        <br><br>TIME COMPLEXITY: <br> O( n^2 )`;
     }
 
     onMouseClick(){
         this.triangulate.onMouseClick();
+
+        if(this.triangulate.isButtonClicked){
+            this.insertPoint(input);
+        }
     }
 
     onMouseMove(){
@@ -220,6 +238,18 @@ class WindingNumber extends Page{
         scenes[4].add(mesh);
 
         drawLine(new THREE.Line3(this.polygon.getFirstPoint(), this.polygon.getLastPoint()), scenes[3], lineBasicMaterial_02);
+
+    }
+
+    insertPoint(input){
+        var dot;
+        var point = new THREE.Vector3(input.x, input.y, 0);
+        if(this.polygon.isInside(point)) dot = new Point(point, dotMaterial_03);
+        else dot = new Point(point, dotMaterial_02);
+
+        
+        dot.dot.geometry.setDrawRange(0,1);
+        scenes[4].add(dot.dot.clone());
 
     }
 
