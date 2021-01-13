@@ -140,6 +140,13 @@ class WindingNumber extends Page{
 
         var isFirstPoint = true;
 
+        if(!polygon.getOrientation()){
+            var firstPoint = lightMap[0];
+            for(var i=0; i<lightMap.length-1; i++)
+                lightMap[i] = lightMap[i+1];
+            lightMap[lightMap.length-1] = firstPoint;
+        }
+
         for(var i=0; i<polygon.getPointCount(); i++){
             var index = i*3;
             var point = polygon.getPoint(index);
