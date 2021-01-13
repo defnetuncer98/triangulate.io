@@ -8,6 +8,7 @@ class WindingNumber extends Page{
         this.triangulate = new Triangulate();
         this.triangulate.init();
         this.polygon = new Polygon();
+        scenes[4].add( this.polygon.polygon );
     }
 
     init(){
@@ -68,6 +69,13 @@ class WindingNumber extends Page{
 
     createLightPolygon(){
         var polygon = this.triangulate.polygon;
+        
+        var lightMap = [];
+
+        var vertexMap = [];
+
+        for(var i=0; i<polygon.getPointCount(); i++) lightMap.push([]);
+
         for(var i=0; i<polygon.getPointCount(); i++){
             var startIndex = i*3;
             var startPoint = polygon.getPoint(startIndex);
@@ -104,8 +112,9 @@ class WindingNumber extends Page{
                 drawLine(line3, scenes[1], lineBasicMaterial_03);
 
                 var intersection = new THREE.Vector3();
-                var hit = new THREE.Line3();
+                var hit = [];
                 if(polygon.isIntersecting(line3, hit, intersection)){
+                    lightMap[hit[0]].push(intersection);
                     
                     var dot = new Point(intersection.clone(), dotMaterial_02);
         
@@ -121,7 +130,44 @@ class WindingNumber extends Page{
 
             dot.dot.geometry.setDrawRange(0,1);
             for(var j=1; j<scenes.length; j++) scenes[j].add(dot.dot.clone());
+
+            vertexMap.push(light);
         }
+
+        for(var i=0; i<polygon.getPointCount(); i++){
+            var index = i*3;
+            var point = polygon.getPoint(index);
+
+            if(vertexMap[i]) this.polygon.addPoint(point);
+
+            if(lightMap[i].length != 0){
+                var min = 0;
+                var minDist = point.distanceTo(lightMap[i][0]);
+                var max = 0;
+                var maxDist = point.distanceTo(lightMap[i][0]);
+
+                for(var j=1; j<lightMap[i].length; j++){
+                    var dist = point.distanceTo(lightMap[i][j]);
+                    if(dist < minDist){
+                        minDist = dist;
+                        min = j;
+                    }
+
+                    if(dist > maxDist){
+                        maxDist = dist;
+                        max = j;
+                    }
+                }
+
+                this.polygon.addPoint(lightMap[i][min]);
+
+                if(min != max) this.polygon.addPoint(lightMap[i][max]);
+
+            }
+        }
+
+        drawLine(new THREE.Line3(this.polygon.getFirstPoint(), this.polygon.getLastPoint()), scenes[4]);
+
     }
 
     windNumber(){

@@ -110,7 +110,8 @@ class Polygon {
         return false;
     }
 
-    isIntersecting(line, hit = new THREE.Line3(), intersection=new THREE.Vector3()){
+    isIntersecting(line, hit = [], intersection=new THREE.Vector3()){
+        hit.push(0);
         var intersectionFound = false;
         var distance = 0;
         for(var k=0; k<this.getPointCount(); k++){
@@ -126,8 +127,7 @@ class Polygon {
 
 
                 if(!intersectionFound || distance > temp.distanceTo(line.start)){
-                    hit.start = trio2.b;
-                    hit.end = trio2.c;
+                    hit[0] = k;
                     intersection.x = temp.x;
                     intersection.y = temp.y;
                     intersection.z = temp.z;
