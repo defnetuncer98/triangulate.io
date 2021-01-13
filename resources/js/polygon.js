@@ -1,7 +1,7 @@
 class Polygon {
-    constructor(){
+    constructor(mat = lineBasicMaterial_02){
         this.curPolygonIndex = 0;
-        this.polygon = createLineGeometry(500);
+        this.polygon = createLineGeometry(500, mat);
         this.polygon.geometry.setDrawRange( 0, 0 );
         this.polygonPoints = this.polygon.geometry.attributes.position.array;
         this.orientation = null;
@@ -159,9 +159,9 @@ class Polygon {
 
         if(debug) {
             if(out)
-                drawDashedLine(ray, scenes[4], 5, lineBasicMaterial_02_Transparent);
+                drawDashedLine(ray, scenes[3], 5, lineBasicMaterial_02_Transparent);
             else
-                drawDashedLine(ray, scenes[4], 5, lineBasicMaterial_02_Transparent);
+                drawDashedLine(ray, scenes[3], 5, lineBasicMaterial_02_Transparent);
         }
 
         return out;

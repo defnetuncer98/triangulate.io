@@ -40,6 +40,9 @@ function clearScene(scene){
 }
 
 function resetAll(){
+    for(var i=0; i<containers.length; i++){
+        containers[i].style.display = 'block';
+    }
     resetScenes();
     resetInfos();
     hideButtons();

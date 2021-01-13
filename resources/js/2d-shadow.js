@@ -8,7 +8,10 @@ class WindingNumber extends Page{
         this.triangulate = new Triangulate();
         this.triangulate.init();
         this.polygon = new Polygon();
-        scenes[3].add( this.polygon.polygon );
+        scenes[2].add( this.polygon.polygon );
+
+        containers[containers.length-1].style.display = 'none';
+
     }
 
     init(){
@@ -16,29 +19,33 @@ class WindingNumber extends Page{
 
         this.initVariables();
         this.initInfo();
-
     }
 
     initInfo(){
         header1.innerHTML = '<i class="icon fa fa-cube"></i> 2d-shadow';
         header2.innerHTML = "<font size=4em> HOW TO: <br> Click anywhere to start creating polygon!";
-        step1.innerHTML = "<br>STEP 1 | Fat Triangulation";
-        info1.innerHTML = `<font size=4em> TASK: <br> Finding a path for the agent to move from the source point to the target point while avoiding obstacles at a safe distance.
-        <br><br>HOW TO:<br> A fat triangulation is generated using obstacles and plane's corners.
-        <br><br>ALGORITHM: <br>Delaunay
-        <br><br>TIME COMPLEXITY: <br> O( nlogn )`;
+        step1.innerHTML = "<br><br>STEP 1 | Light Rays";
+        info1.innerHTML = `<font size=4em> TASK: <br> Find which vertices of the polygon are in the shadow.
+        <br><br>HOW TO:<br>  A vertex is marked as <b><font color=#7FFF00>in the light</b></font> if there exists a ray coming from a light source.
+        It is <b><font color=#FF0000>in the shadow</b></font> if other vertices are blocking the light.
+        In our case we assume light is coming from all directions outside of polygon.
+        <br><br>Since light is only blocked by polygons' own vertices, rays are shot from a vertex to all other vertices.
+        From those rays, ones that aren't crossing any edge and are outside of the polygon are marked as <b>light rays</b>.
+        If no ray can be marked as light ray, that vertex is marked as in the shadow.
+        <br><br>Since we now know that whether the ray is a light ray, and our initial vertex is the one that is blocking the light, we can also find where it hits first on the boundry of the polygon, and add the intersection point as another light vertex of the polygon on the edge it hits.
+        <b>This way we will know where the light starts and ends on an edge.</b>
+        <br>This step is repeated for all vertices.
+        <br><br>TIME COMPLEXITY: <br> O( n^3 )`;
 
-        step2.innerHTML = "<br><br><br><br><br>STEP 2 | Weighted Graph";
-        info2.innerHTML = `<font size=4em> TASK: <br> Generate possible paths using the triangulation.
-        <br><br>HOW TO:<br> Possible paths are generated and saved as a weighted graph, where nodes are the midpoints of the edges of the triangulation and weights are the distance it takes to travel from an edge of an triangle to another edge.
-        <br> Source and target points are also added to the graph as nodes. Paths that are intersecting with obstacles are found and removed from the graph.
-        <br><br>GRAPH REPRESENTATION: <br> Adjacency List
-        <br><br>TIME COMPLEXITY: <br> O( n^2 )`;
+        step2.innerHTML = "<br><br>STEP 2 | Removing Shadow Vertices";
+        info2.innerHTML = `<font size=4em> TASK: <br> Vertices that are in the shadow are removed so that the new boundary is generated.
+        <br><br>HOW TO:<br> All vertices are traversed vertices that are in the shadow are removed from the polygon.
+        <br><br>TIME COMPLEXITY: <br> O( n )`;
 
-        step3.innerHTML = "STEP 3 | Shortest Path";
-        info3.innerHTML = `<font size=4em> TASK: <br> Given a source and a target node find the shortest path.
-        <br><br>ALGORITHM: Dijkstra
-        <br><br>TIME COMPLEXITY: <br> O( n^2 )`;
+        step3.innerHTML = "<br><br><br>Click to Insert Points!";
+        info3.innerHTML = `<font size=4em> TASK: <br> When a point is given as input it is decided whether the point is inside the shadow zone or the light zone.
+        <br><br>HOW TO:<br> A ray is shot and by traversing all edges, how many edges it hits is found. If it hits an even number of edges it is marked as outside of the generated polygon.
+        <br><br>TIME COMPLEXITY: <br> O( n )`;
     }
 
     onMouseClick(){
@@ -68,13 +75,23 @@ class WindingNumber extends Page{
     
         showSteps();
 
-        this.triangulate.cloneScene([1,2,4]);
+        this.triangulate.cloneScene([1,3]);
+
+        var polygon = new Polygon(lineBasicMaterial_07);
+        polygon.polygon.geometry.attributes.position.array = this.triangulate.polygon.polygon.geometry.attributes.position.array;
+        polygon.polygon.geometry.setDrawRange( 0, this.triangulate.polygon.getPointCount() );
+        polygon.polygon.geometry.attributes.position.needsUpdate = true;
+        polygon.polygon.position.z -= 1;
+        scenes[2].add(polygon.polygon);
+
+        drawLine(new THREE.Line3(this.triangulate.polygon.getFirstPoint(), this.triangulate.polygon.getLastPoint()), scenes[2], lineBasicMaterial_07);
 
         this.createLightPolygon();
     }
 
     onClickedResetButton(){
         this.triangulate.onClickedResetButton();
+        init();
     }
     
     onEnteredResetButton(){
@@ -141,7 +158,7 @@ class WindingNumber extends Page{
                     var dot = new Point(intersection.clone(), dotMaterial_02);
         
                     dot.dot.geometry.setDrawRange(0,1);
-                    for(var k=1; k<scenes.length-1; k++) scenes[k].add(dot.dot.clone());
+                    for(var k=1; k<scenes.length-2; k++) scenes[k].add(dot.dot.clone());
                 }
 
             }
@@ -151,7 +168,7 @@ class WindingNumber extends Page{
             else dot = new Point(startPoint.clone(), dotMaterial_03);
 
             dot.dot.geometry.setDrawRange(0,1);
-            for(var j=1; j<scenes.length-1; j++) scenes[j].add(dot.dot.clone());
+            for(var j=1; j<scenes.length-2; j++) scenes[j].add(dot.dot.clone());
 
             vertexMap.push(light);
         }
@@ -210,7 +227,7 @@ class WindingNumber extends Page{
                     this.polygon.addPoint(maxPoint);
                     shape.lineTo(maxPoint.x, maxPoint.y);
                 }
-
+/*
                 if(!vertexMap[polygon.getNextIndex(index)/3]){
                     for(var k=2; k<3; k++) drawLine(new THREE.Line3(maxPoint, polygon.getPoint(polygon.getNextIndex(index))), scenes[k], lineBasicMaterial_07);
                 }
@@ -226,7 +243,7 @@ class WindingNumber extends Page{
                 
                 if(!vertexMap[polygon.getPreviousIndex(index)/3]){
                     for(var k=2; k<3; k++) drawLine(new THREE.Line3(point, polygon.getPoint(polygon.getPreviousIndex(index))), scenes[k], lineBasicMaterial_07);
-                }
+                }*/
             }
         }
 
@@ -235,9 +252,9 @@ class WindingNumber extends Page{
         const material = new THREE.MeshBasicMaterial( { color: 0xff0000, transparent: true, opacity: 0.4 } );
         const mesh = new THREE.Mesh( geometry, material ) ;
 
-        scenes[4].add(mesh);
+        scenes[3].add(mesh);
 
-        drawLine(new THREE.Line3(this.polygon.getFirstPoint(), this.polygon.getLastPoint()), scenes[3], lineBasicMaterial_02);
+        drawLine(new THREE.Line3(this.polygon.getFirstPoint(), this.polygon.getLastPoint()), scenes[2], lineBasicMaterial_02);
 
     }
 
@@ -249,7 +266,7 @@ class WindingNumber extends Page{
 
         
         dot.dot.geometry.setDrawRange(0,1);
-        scenes[4].add(dot.dot.clone());
+        scenes[3].add(dot.dot.clone());
 
     }
 
