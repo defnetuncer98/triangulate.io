@@ -98,7 +98,7 @@ class WindingNumber extends Page{
 
                 light = true;
 
-                //drawLine(new THREE.Line3(startPoint, endPoint), scenes[1], lineBasicMaterial_03);
+                //drawLine(new THREE.Line3(startPoint, endPoint), scenes[1], lineBasicMaterial_03_Transparent);
 
                 var dir = new THREE.Vector3();
                 dir.subVectors(startPoint, endPoint);
@@ -115,7 +115,8 @@ class WindingNumber extends Page{
                 var hit = [];
                 if(polygon.isIntersecting(line3, hit, intersection)){
 
-                    drawLine(new THREE.Line3(endPoint, intersection), scenes[1], lineBasicMaterial_03);
+                    drawLine(new THREE.Line3(endPoint, startPoint), scenes[1], lineBasicMaterial_03);
+                    drawDashedLine(new THREE.Line3(startPoint, intersection), scenes[1], 5, lineBasicMaterial_03);
 
                     lightMap[hit[0]].push(intersection);
                     

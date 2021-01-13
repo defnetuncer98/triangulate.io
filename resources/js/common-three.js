@@ -31,6 +31,24 @@ function drawLine(line, scene, mat=lineBasicMaterial_03){
     return lineGeometry;
 }
 
+function drawDashedLine(line, scene, dashSize=1, mat=lineBasicMaterial_03){
+    var length = line.distance();
+
+    var dashCount = Math.floor(length / dashSize);
+
+    for(var i=0; i<dashCount; i+=2){
+        var startAt = i/dashCount;
+        var start = new THREE.Vector3();
+        line.at(startAt,start);
+        
+        var endAt = (i+1)/dashCount;
+        var end = new THREE.Vector3();
+        line.at(endAt,end);
+
+        drawLine(new THREE.Line3(start, end), scene, mat);
+    }
+}
+
 function createLineGeometry(point_count, mat = lineBasicMaterial_02){
     const geometry = new THREE.BufferGeometry();
 
