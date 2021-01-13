@@ -8,7 +8,7 @@ class WindingNumber extends Page{
         this.triangulate = new Triangulate();
         this.triangulate.init();
         this.polygon = new Polygon();
-        scenes[4].add( this.polygon.polygon );
+        scenes[3].add( this.polygon.polygon );
     }
 
     init(){
@@ -50,7 +50,7 @@ class WindingNumber extends Page{
     
         showSteps();
 
-        this.triangulate.cloneScene();
+        this.triangulate.cloneScene([1,2,4]);
 
         this.createLightPolygon();
     }
@@ -109,17 +109,18 @@ class WindingNumber extends Page{
                 if(polygon.isInCone(startIndex, line3, false))
                     continue;
                                     
-                drawLine(line3, scenes[1], lineBasicMaterial_03);
-
                 var intersection = new THREE.Vector3();
                 var hit = [];
                 if(polygon.isIntersecting(line3, hit, intersection)){
+
+                    drawLine(new THREE.Line3(endPoint, intersection), scenes[1], lineBasicMaterial_03);
+
                     lightMap[hit[0]].push(intersection);
                     
                     var dot = new Point(intersection.clone(), dotMaterial_02);
         
                     dot.dot.geometry.setDrawRange(0,1);
-                    for(var k=1; k<scenes.length; k++) scenes[k].add(dot.dot.clone());
+                    for(var k=1; k<scenes.length-1; k++) scenes[k].add(dot.dot.clone());
                 }
 
             }
@@ -129,16 +130,28 @@ class WindingNumber extends Page{
             else dot = new Point(startPoint.clone(), dotMaterial_03);
 
             dot.dot.geometry.setDrawRange(0,1);
-            for(var j=1; j<scenes.length; j++) scenes[j].add(dot.dot.clone());
+            for(var j=1; j<scenes.length-1; j++) scenes[j].add(dot.dot.clone());
 
             vertexMap.push(light);
         }
+
+        const shape = new THREE.Shape();
+        shape.autoClose = true;
+
+        var isFirstPoint = true;
 
         for(var i=0; i<polygon.getPointCount(); i++){
             var index = i*3;
             var point = polygon.getPoint(index);
 
-            if(vertexMap[i]) this.polygon.addPoint(point);
+            if(vertexMap[i]) {
+                this.polygon.addPoint(point);
+
+                if(isFirstPoint)shape.moveTo(point.x, point.y);
+                else shape.lineTo(point.x, point.y);
+
+                isFirstPoint = false;
+            }
 
             if(lightMap[i].length != 0){
                 var min = 0;
@@ -160,13 +173,25 @@ class WindingNumber extends Page{
                 }
 
                 this.polygon.addPoint(lightMap[i][min]);
+                shape.lineTo(lightMap[i][min].x, lightMap[i][min].y);
 
-                if(min != max) this.polygon.addPoint(lightMap[i][max]);
+
+                if(min != max) {
+                    this.polygon.addPoint(lightMap[i][max]);
+                    shape.lineTo(lightMap[i][max].x, lightMap[i][max].y);
+                }
 
             }
         }
 
-        drawLine(new THREE.Line3(this.polygon.getFirstPoint(), this.polygon.getLastPoint()), scenes[4]);
+        
+        const geometry = new THREE.ShapeGeometry( shape );
+        const material = new THREE.MeshBasicMaterial( { color: 0xff0000, transparent: true, opacity: 0.4 } );
+        const mesh = new THREE.Mesh( geometry, material ) ;
+
+        scenes[4].add(mesh);
+
+        drawLine(new THREE.Line3(this.polygon.getFirstPoint(), this.polygon.getLastPoint()), scenes[3], lineBasicMaterial_02);
 
     }
 

@@ -123,13 +123,11 @@ class Triangulate extends Page{
         this.triangulate();
     }
 
-    cloneScene(){
-        scenes[1].add(this.polygon.polygon.clone());
-        scenes[1].add(this.line.line.clone());
-        scenes[2].add(this.polygon.polygon.clone());
-        scenes[2].add(this.line.line.clone());
-        scenes[3].add(this.polygon.polygon.clone());
-        scenes[3].add(this.line.line.clone());
+    cloneScene(sceneIndices = [1, 2, 3]){
+        sceneIndices.forEach( i => {
+            scenes[i].add(this.polygon.polygon.clone());
+            scenes[i].add(this.line.line.clone());
+        });
     }
     
     triangulate(){
