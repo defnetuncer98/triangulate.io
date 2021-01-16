@@ -84,7 +84,9 @@ class WindingNumber extends Page{
         polygon.polygon.position.z -= 1;
         scenes[2].add(polygon.polygon);
 
-        drawLine(new THREE.Line3(this.triangulate.polygon.getFirstPoint(), this.triangulate.polygon.getLastPoint()), scenes[2], lineBasicMaterial_07);
+        var line = drawLine(new THREE.Line3(this.triangulate.polygon.getFirstPoint(), this.triangulate.polygon.getLastPoint()), scenes[2], lineBasicMaterial_07, false);
+        line.position.z -= 1;
+        scenes[2].add(line);
 
         this.createLightPolygon();
     }
@@ -128,7 +130,7 @@ class WindingNumber extends Page{
                 if(polygon.isInCone(startIndex, line, false) || polygon.isInCone(endIndex, line2, false))
                     continue;
 
-                if(polygon.raycast(line, 5, false))
+                if(polygon.raycast(line, 10, false))
                     continue;
 
                 light = true;

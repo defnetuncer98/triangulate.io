@@ -17,7 +17,7 @@ function createText(font, message, x, y, z, size, mat){
     return text;
 }
 
-function drawLine(line, scene, mat=lineBasicMaterial_03){
+function drawLine(line, scene, mat=lineBasicMaterial_03, addToScene = true){
     var lineGeometry = createLineGeometry(2, mat);
     lineGeometry.computeLineDistances();
     const linePoints = lineGeometry.geometry.attributes.position.array;
@@ -27,7 +27,10 @@ function drawLine(line, scene, mat=lineBasicMaterial_03){
     linePoints[3] = line.end.x
     linePoints[4] = line.end.y;
     linePoints[5] = line.end.z;
-    scene.add(lineGeometry);
+
+    if(addToScene)
+        scene.add(lineGeometry);
+        
     return lineGeometry;
 }
 
